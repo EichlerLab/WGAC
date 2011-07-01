@@ -25,7 +25,7 @@ def main():
         output_fh.close()
 
 
-def parse_blast(csv_reader, csv_writer, min_identity=94, min_alignment_length=900):
+def parse_blast(csv_reader, csv_writer, min_identity=94, min_alignment_length=1000):
     output_fields = [""]
     for row in csv_reader:
         if (row[0].startswith("#") and "Fields" not in row[0]) or "run finished" in row[0]:
