@@ -31,14 +31,14 @@ def main():
         logger.debug("Opening BLAST input: %s", sys.argv[1])
         blast = open(sys.argv[1])
     except IOError, e:
-        print "Couldn't open BLAST file '%s': %s" % (sys.argv[1], e.message)
+        print "Couldn't open BLAST file '%s': %s" % (sys.argv[1], e)
 
     try:
         logger.debug("Opening WGAC input: %s", sys.argv[2])
         wgac = open(sys.argv[2])
         wgac_rows = [row for row in csv.reader(wgac, delimiter="\t")]
     except IOError, e:
-        print "Couldn't open WGAC file '%s': %s" % (sys.argv[2], e.message)
+        print "Couldn't open WGAC file '%s': %s" % (sys.argv[2], e)
     finally:
         wgac.close()
 
