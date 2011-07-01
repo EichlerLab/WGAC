@@ -5,8 +5,12 @@ Run tests:
 python -m doctest -v blast_wgac_matcher.py
 """
 import csv
+import logging
 import pprint
 import sys
+
+logger = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
 
 
 SEQUENCE=0
@@ -24,11 +28,13 @@ def main():
         sys.exit(1)
 
     try:
+        logger.debug("Opening BLAST input: %s", sys.argv[1])
         blast = open(sys.argv[1])
     except IOError, e:
         print "Couldn't open BLAST file '%s': %s" % (sys.argv[1], e.message)
 
     try:
+        logger.debug("Opening WGAC input: %s", sys.argv[2])
         wgac = open(sys.argv[2])
         wgac_rows = [row for row in csv.reader(wgac, delimiter="\t")]
     except IOError, e:
@@ -68,8 +74,10 @@ def main():
     inversions = 0
     for row in blast_reader:
         inversion = False
-        
+
+        logger.debug("Testing chromosome: %s", row[CHROMOSOME])
         if row[CHROMOSOME] in wgac_by_chromosome:
+            logger.info("Matched chromosome: %s", row[CHROMOSOME])
             start = int(row[START])
             end = int(row[END])
 
