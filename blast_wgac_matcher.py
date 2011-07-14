@@ -39,7 +39,7 @@ def main():
         wgac_rows = [row for row in csv.reader(wgac, delimiter="\t")]
     except IOError, e:
         print "Couldn't open WGAC file '%s': %s" % (sys.argv[2], e)
-    finally:
+    else:
         wgac.close()
 
     # WGAC input:
