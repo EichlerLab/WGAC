@@ -62,10 +62,7 @@ def main():
     # Setup the CSV reader for the blast data and write out the same header for
     # the output as the input.
     blast_reader = csv.reader(blast, delimiter="\t")
-    
     header = blast_reader.next()
-#     header = [field for field in header if header.index(field) in OUTPUT_FIELDS]
-#     writer.writerow(header)
     
     # For each blast result, lookup the chromosome of the result in the WGAC
     # table and determine whether the blast coordinates fall within the range of
