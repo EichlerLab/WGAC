@@ -97,8 +97,7 @@ def main():
                     if inversion:
                         inversions += 1
 
-                    writer.writerow([field for field in row
-                                     if row.index(field) in OUTPUT_FIELDS])
+                    writer.writerow([row[index] for index in OUTPUT_FIELDS] + [row[CHROMOSOME]])
                     break
 
     print "%s: %s matches (%s inversions)" % (sys.argv[1], matches, inversions)
