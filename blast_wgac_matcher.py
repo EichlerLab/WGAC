@@ -77,7 +77,7 @@ def main():
 
         logger.debug("Testing chromosome: %s", row[CHROMOSOME])
         if row[CHROMOSOME] in wgac_by_chromosome:
-            logger.info("Matched chromosome: %s", row[CHROMOSOME])
+            logger.debug("Matched chromosome: %s", row[CHROMOSOME])
             start = int(row[START])
             end = int(row[END])
 
