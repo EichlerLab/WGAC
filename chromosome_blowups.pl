@@ -72,72 +72,18 @@ foreach my $chr (@chr) {
 		
 		}
 
-		#####the below was added on 6/18/2003
 		if(defined($c[6]) && $c[6] ne ''){
 		  my $tmp = join "\t", @c;
 		  $tmp .= "\n";
 		  print OUT $tmp;
 		}
 		else{
-		##### the above was added on 6/18/2003
-
 		  print OUT "$c[0]\t$c[1]\t$c[2]\t$c[3]\t0\t9\tgap\n";
 		}
-		#white means gaps (centromeres and parms are purple)
-		#for (my $i=0; $i< @c; $i++) {
-		#	print "$i)$c[$i] ";
-		#}
-		#print "\n";
-		#my $pause=<STDIN>;
 	}
-	close CHR;
-	
 
-##### Comment out hotspots. May use later ######
-#  	open (CHR, "oo.2N.weld10kb.join.all.cull.hotspots.reformat.span.nooverlap") || die "Can't read oo.2N.weld10kb.join.all.cull.hotspots.reformat.span.nooverla!\n";
-#	my $head=<CHR>;
-# 	my %chrpair=();
-# 	while (<CHR>) {
-# 		s/\r\n/\n/;
-#		chomp;
-#		my @c = split /\t/;
-#		next if $c[0] ne $chr && $c[3] eq 'white';  
-#		if ($c[0] eq $chr) {
-#			$c[1]= int ($c[1]*$scale);
-#			$c[2]= int ($c[2]*$scale);
-#			$c[3]='orange';
-#			$c[4]='red';
-#		}
-#		print OUT "$c[0]\t$c[1]\t$c[2]\torange\t10\t9\thotspot\n";
-#	}
+	close CHR;
 	close OUT;
-#	close CHR;
-	
-#  die "";
-  #print "COLLECTING CELERA DUP POSITIVE REGIONS TO DISPLAY ($chr)\n";
- # open (CHR, "DupPosNonredundant.txt.nooverlap") || die "Can't read DupPosNonredundant.txt.nooverlap!\n";
- # open (OUT, ">chr.duppos.extras") || die "Can't writechr.duppos.extras\n";
- # my $head =<CHR>;
- # print OUT "seq\tbegin\tend\tcolor\toffset\twidth\n";
- # while (<CHR>) {
-#		my @c = split /\t/;
-#
-#		next if $c[0] ne $chr ;
-#		next if $c[2]-$c[1] < $min_duppos_size;
-#		if ($c[0] eq $chr) {
-#			$c[1]= int ($c[1]*$scale);
-#			$c[2]= int ($c[2]*$scale);
-#		
-#		}
-#		#for (my $i=0; $i< @c; $i++) {
-		#	print "$i)$c[$i] ";
-		#}
-		#print "\n";
-#		
-#		print OUT "$c[0]\t$c[1]\t$c[2]\tblack\t15\t12\n";
-#		#my $pause=<STDIN>;
-#	}
-#	close OUT;
   
   print "REMOVING ALIGNMENTS THAT ARE NOT CHROMOSOME ($chr)\n";
   open (CHR, $alignfile) || die "Can't read alignment.pieces!\n";
@@ -160,19 +106,15 @@ foreach my $chr (@chr) {
 				$c[$_+3]=$scaled_length;
 			}
 		}
-		#for (my $i=0; $i< @c; $i++) {
-		#	print "$i)$c[$i] ";
-		#}
-		#print "\n";
 		print OUT join ("\t",@c);
-		#my $pause=<STDIN>;
 	}
 	close OUT;
 	print "GENERATING LAYOUT FOR ($chr)\n";
 	open (OUT , ">chr.layout" ) || die "Can't write chr.layout!\n";
 	print OUT "sequence\theader\n";
 	foreach my $c (@chr ){
-		print OUT "$c\t$spot\n" if $c ne $chr && defined $chrpair{$c};  #leave blank space for current chr
+        # Leave blank space for current chr.
+		print OUT "$c\t$spot\n" if $c ne $chr && defined $chrpair{$c};
 		$spot += $len{$c} + $bp_spacing;
 		if ($c eq 'chr8') {
 			#inset the middle line#
@@ -210,30 +152,8 @@ foreach my $chr (@chr) {
 	my $kb=int($min_bp_size/1000);
 	my $perc=int($min_percent*1000)/10;
 	system "mv screen.ps $outdir/$chr"."_$kb"."kb_$perc"."perc.ps";
-	
-	
-#		." -options '-seq_tick_whole=>0,-extra_label_size=>12,-filename_on=>0,-text_text=>$name, 
-#-text_offset=>250, -graph1_label_size=12,-text_offset_h=>280,-text_color=>green,-graph2_label_on=>0,-graph1_label_decimal=>3,-gscale_indent=>-60,-graph1_max=>1,-gscale_on=>1,-graph1_min=>0.98,-screen_indent_l=>80,-screen_bpwidth=>$width,-extra_label_on=>1,-seq_tick_bp=>10000,-extra_label_col=>$label_column, -seq_names_offset=>7, -seq_names_size=>13,-seq_names_color=>darkgrey, -extra_label_color=>black,-window_width=>700, -window_height=>400, -pair_intra_line_on=>1,-sub_on=>0,-seq_tick_e_label_offset=>-4,-seq_tick_e_length=>1,-seq_tick_e_label_offset_h=>12, -seq_tick_e_label_size=>11'";
-
-
-
-
-#	my $label_column=8;
-#	my $width=$tot_seq;
-#	my $command= "parasight71.pl  -show $opt{'out'}.show -graph1 $opt{'out'}.graph1 -arrange file:$opt{'out'}.arrange -extra $opt{'out'}.extra"
-#		." -options '-seq_tick_whole=>0,-extra_label_size=>12,-filename_on=>0,-text_text=>$name, -text_offset=>250, -graph1_label_size=12,-text_offset_h=>280,-text_color=>green,-graph2_label_on=>0,-graph1_label_decimal=>3,-gscale_indent=>-60,-graph1_max=>1,-gscale_on=>1,-graph1_min=>0.98,-screen_indent_l=>80,-screen_bpwidth=>$width,-extra_label_on=>1,-seq_tick_bp=>10000,-extra_label_col=>$label_column, -seq_names_offset=>7, -seq_names_size=>13,-seq_names_color=>darkgrey, -extra_label_color=>black,-window_width=>700, -window_height=>400, -pair_intra_line_on=>1,-sub_on=>0,-seq_tick_e_label_offset=>-4,-seq_tick_e_length=>1,-seq_tick_e_label_offset_h=>12, -seq_tick_e_label_size=>11'";
-#	if ($opt{'psonly'} ) {
-#		$command .= " -precode '&print_screen(0);  ' -die ";
-#	} else {
-#		#$command .= " -precode 'unlink \"$opt{out}.align\"; unlink \"$opt{out}.extras\";' " ;
-#	}
-#	print "$command\n";
-#	system $command;
-#	#die "";
-
-
 }
-###################################
+
 ####subroutines####################
 	
 sub lookup {
@@ -250,7 +170,6 @@ sub lookup {
 	print  "Too many matching ($input) => ",join(" ",@accdir), "\n"  if @accdir >1;
 	$dir .= "/$accdir[0]";
 	return ($dir,$accdir[0]) if @accdir==1; 
-	#my $pause=<STDIN>;
 	next ACC_LOOP;  #accdir[0] really version#
 }
 		
@@ -266,13 +185,6 @@ sub load_fasta {
 	return ($fasta, $header);
 	
 }
-
-
-=head2
-
-
-
-
 
 
 
