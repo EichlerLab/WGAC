@@ -12,13 +12,18 @@ import sys
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
 
+# QNAME   QB      QE      QLEN    SNAME   SB      SE      SLEN    FRACBPIDENT     BPALIGN SIZEALIGN       SCORE   QDEFN       SDEFN
+# AC239860.3      113870  98540   191275  chr1    146000931       146016260       400000  0.998825525251207       15326       15335   15222   AC239860.3
+
+#QNAME   QB      QE      QLEN    SNAME   SB      SE      SLEN    FRACBPIDENT     BPALIGN SIZEALIGN
+#AC244963.1      40500   42286   5000    chr1    3185290 3187085 125616256       0.925591882750846       1774    1809
 
 SEQUENCE=0
-CHROMOSOME=1
-BAC_START=6
-BAC_END=7
-START=8
-END=9
+BAC_START=1
+BAC_END=2
+CHROMOSOME=4
+START=5
+END=6
 OUTPUT_FIELDS = (SEQUENCE, BAC_START, BAC_END)
 
 
@@ -50,7 +55,7 @@ def main():
 
     wgac_by_chromosome = {}
     for row in wgac_rows:
-        coordinate_range = map(int, row[1:])
+        coordinate_range = map(int, row[1:3])
         if coordinate_range[0] > coordinate_range[1]:
             print "WGAC inversion found: %s, %s" % coordinate_range
 
