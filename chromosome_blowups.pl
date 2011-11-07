@@ -5,7 +5,6 @@ use File::Copy;
 
 use constant True => 1;
 use constant False => 0;
-use vars qw(%opt @acc $max_celera $public_length $cbac $sim_auto $sim_sex $sim_min);
 use vars qw($program $pversion $pdescription $pgenerate);
 
 $program = "$0";
@@ -15,11 +14,7 @@ $pversion='1.010727';
 $pdescription = "$program (ver:$pversion)  generates parasight views with a single chromosome at center version";
 $pgenerate= 'jeff:dnhc genetics:dnh';
 ### program stats end ###
-#print "usage: $program -in [path] -out [path] [options]\n";
-#
 
-
-#build35
 my %len;
 
 # TODO: replace hard-coded chromosome lengths with a configuration file.
