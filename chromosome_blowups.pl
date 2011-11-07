@@ -24,7 +24,14 @@ my %len;
 my @chr=qw(chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chr20 chr21 chr22 chrX chrY);
 my @order=qw(chr16 chr19 chr5 chr1 chr2 chr3 chr4 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr17 chr18 chr20 chr21 chr22 chrX chrY);
 
-if(scalar(@ARGV) != 6) { die "chromosome_blowups113.pl \n\t[alignment file]\n\t[Gap/extra fiel]\n\t[min bp]\n\t[min pcent identity]\n\t[chrom to show. all for all chroms, chr1 for chromosome 1 only ......]\n\t[\"1\" to automate the process (kill the parasight view after generating the ps file. Non \"1\" to keep the window\n";}
+if(scalar(@ARGV) != 6) { die "chromosome_blowups113.pl
+    [alignment file]
+    [gap/extra file]
+    [min bp]
+    [min percent identity]
+    [chrom to show. all for all chroms, chr1 for chromosome 1 only ......]
+    [\"1\" to automate the process (kill the parasight view after generating the ps file. Non \"1\" to keep the window\n";
+}
 my $alignfile = $ARGV[0];
 my $gapfile = $ARGV[1];
 my $chr_show = $ARGV[4];
