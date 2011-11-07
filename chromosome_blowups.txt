@@ -1,0 +1,9 @@
+parasight71.pl \
+    -show chr1,249250621:chr2,243199373:chr3,198022430:chr4,191154276:chr5,1818000000:chr6,171115067:chr7,159138663:chr8,146364022:chr9,141213431:chr10,135534747:chr11,135006516:chr13,115169878:chr15,102531392:chr16,90354753:chr17,81195210:chr18,78077248:chr19,59128983:chr20,63025520:chr21,48129895:chr22,51304566:chrY,59373566: \
+    -arrange file:chr.layout \
+    -extra chr.extras \
+    -align chr.alignments \
+    -options '-pair_level=>intra_over_inter, -seq_names_size=>16, -sub_on=>0, -seq_space_paragraph=>120, -seq_space_wrap=>120,-pair_intra_line_on=>1, -pair_inter_line_on=>1, -pair_type_col=>0, -pair_type_col2=>4,-seq_tick_whole=>0, -seq_names_pattern=>chr(\w+), -seq_tick_on=>0,-seq_tick_b_on=>0, -seq_tick_e_on=>0, -filename_on=>0, -screen_bpwidth =>1821000000 ' \
+    -precode '$canvas->raise(inter); $canvas->raise(intra); $canvas->raise(seqn); &print_screen(0); ' \
+    -die
+
