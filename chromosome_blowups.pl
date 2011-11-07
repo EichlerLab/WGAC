@@ -85,12 +85,12 @@ foreach my $chr (@chr) {
 	close CHR;
 	close OUT;
   
-  print "REMOVING ALIGNMENTS THAT ARE NOT CHROMOSOME ($chr)\n";
-  open (CHR, $alignfile) || die "Can't read alignment.pieces!\n";
-  open (OUT, ">chr.alignments") || die "Can't write chr.alignments!\n";
-  my $head =<CHR>;
-  print OUT $head;
-  while (<CHR>) {
+    print "REMOVING ALIGNMENTS THAT ARE NOT CHROMOSOME ($chr)\n";
+    open (CHR, $alignfile) || die "Can't read alignment.pieces!\n";
+    open (OUT, ">chr.alignments") || die "Can't write chr.alignments!\n";
+    my $head =<CHR>;
+    print OUT $head;
+    while (<CHR>) {
 		my @c = split /\t/;
 		next if $c[27] < $min_percent;
 		next if $c[0] ne $chr && $c[4] ne $chr;
