@@ -15,7 +15,8 @@ $pdescription = "$program (ver:$pversion)  generates parasight views with a sing
 $pgenerate= 'jeff:dnhc genetics:dnh';
 ### program stats end ###
 
-if(scalar(@ARGV) != 7) { die "chromosome_blowups113.pl
+if(scalar(@ARGV) != 7) {
+    die "chromosome_blowups.pl
     [alignment file]
     [gap/extra file]
     [min bp]
@@ -31,7 +32,6 @@ my $chr_show = $ARGV[4];
 
 my $min_bp_size=$ARGV[2];
 my $min_duppos_size=10000;
-die "usage: chromsome_blowups1.pl [min bases] [min frac identity]\n" if !$ARGV[0] || !$ARGV[1];
 my $min_percent=$ARGV[3];
 my $automate = $ARGV[5];
 my $chromosome_lengths_file = $ARGV[6];
