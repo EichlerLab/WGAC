@@ -1,11 +1,11 @@
-#! /bin/sh
+#!/bin/bash
 
 # Trim ends of WGAC sequences.
 #
 # Usage: qsub -q all.q trim-ends.sh -i <INPUT> -f <FASTA FILES> -o <OUTPUT>
 
 # Specify the shell for this job
-#$ -S /bin/sh 
+#$ -S /bin/bash 
 
 export MPICH_PROCESS_GROUP=no
 export P4_RSHCOMMAND=/usr/bin/rsh
@@ -13,8 +13,12 @@ export PRINT_SEQUENCES=2
 export C3_RSH='rsh -q'
 ulimit -c 0
 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/openmpi/1.4-gcc/lib
+export PATH=$PATH:/usr/lib64/openmpi/1.4-gcc/bin
+export MANPATH=$MANPATH:/usr/lib64/openmpi/1.4-gcc/man
+
 # pe request
-#$ -pe mpich 5-10
+#$ -pe orte 5-10
 
 # Send an email when the script begins, ends, aborts, or suspends.
 #$ -m beas
@@ -68,5 +72,8 @@ do
   esac
 done
 
-/net/eichler/vol6/software/mpich-1.2.7-amd64/bin/mpirun -np $NSLOTS -machinefile $TMPDIR/machines /net/eichler/vol5/home/ssajjadi/wgacbin/step_8_mpi/runTrim "perl /net/eichler/vol5/home/ssajjadi/wgacbin/step_8_mpi/Trim.pl"  $INPUT $FASTA $OUTPUT $JOB_ID
+mpirun -mca btl ^openib -np $NSLOTS \
+  /net/eichler/vol4/home/jlhudd/wgac/trim_ends/runTrim \
+  "perl /net/eichler/vol4/home/jlhudd/wgac/trim_ends/Trim.pl" \
+  $INPUT $FASTA $OUTPUT $JOB_ID
 
