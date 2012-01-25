@@ -39,6 +39,9 @@ my $chromosome_lengths_file = $ARGV[6];
 my $bp_spacing=10000000;
 my $scaled_length=1818000000;
 my $screen_width=$scaled_length+3000000;
+# my $bp_spacing=20000000;
+# my $scaled_length=1820000000;
+# my $screen_width=$scaled_length+30000000;
 
 # Read chromosome lengths keeping track of lengths by chromosome name and the
 # order of the chromosomes themselves.
@@ -59,6 +62,14 @@ while (<CHR>) {
     push(@chr, $chromosome);
 }
 close(CHR);
+
+# Define indices for necessary columns in the input file.
+my $min_percent_index = 10;
+my $min_bp_size_index = 8;
+#my $min_percent_index = 27;
+#my $min_bp_size_index = 22;
+my $chr_first_index = 0;
+my $chr_second_index = 4;
 
 my $outdir = "starburst.S$min_bp_size.P$min_percent";
 mkdir $outdir;
@@ -106,16 +117,17 @@ foreach my $chr (@chr) {
     open (OUT, ">chr.alignments") || die "Can't write chr.alignments!\n";
     my $head =<CHR>;
     print OUT $head;
+
     while (<CHR>) {
         my @c = split /\t/;
-        next if $c[27] < $min_percent;
-        next if $c[0] ne $chr && $c[4] ne $chr;
-        next if $c[22] < $min_bp_size;
-        next if $c[0] =~ /random/;
-        next if $c[4] =~ /random/;
-        $chrpair{$c[0]}=1;
-        $chrpair{$c[4]}=1;
-        foreach (0,4) {
+        next if $c[$min_percent_index] < $min_percent;
+        next if $c[$chr_first_index] ne $chr && $c[$chr_second_index] ne $chr;
+        next if $c[$min_bp_size_index] < $min_bp_size;
+        next if $c[$chr_first_index] =~ /random/;
+        next if $c[$chr_second_index] =~ /random/;
+        $chrpair{$c[$chr_first_index]}=1;
+        $chrpair{$c[$chr_second_index]}=1;
+        foreach ($chr_first_index,$chr_second_index) {
             if ($c[$_] eq $chr) {
                 $c[$_+1]= int ($c[$_+1]*$scale);
                 $c[$_+2]= int ($c[$_+2]*$scale);
@@ -153,6 +165,11 @@ foreach my $chr (@chr) {
             $these_chrs.="$c,$len{$c}:";
         }
     
+    }
+
+    if (length($these_chrs) == 0) {
+        print "Couldn't find any data for show line. Skipping $chr.\n";
+        next;
     }
     
     my $command= "parasight71.pl  -show $these_chrs -arrange file:chr.layout -extra chr.extras -align chr.alignments";
