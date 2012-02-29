@@ -9,18 +9,18 @@ fi
 SPECIES=$1
 CHROMOSOMES_DIR=$2
 
-# mkdir -p wgac
-# cd wgac
+mkdir -p wgac
+cd wgac
 
-# ln -s $CHROMOSOMES_DIR fastawhole
+ln -s $CHROMOSOMES_DIR fastawhole
 
-# echo "Fractionate"
-# mkdir -p fasta
-# fasta_fractionate -f fastawhole -s 400000 -o fasta
+echo "Fractionate"
+mkdir -p fasta
+fasta_fractionate -f fastawhole -s 400000 -o fasta
 
-# echo "Get mask out from lowercase letters"
-# mkdir -p mask_out
-# ls fasta | xargs -i perl ~jlhudd/wgac/maskOutGenFromLowCase.pl fasta/{} mask_out/{}.out
+echo "Get mask out from lowercase letters"
+mkdir -p mask_out
+ls fasta | xargs -i perl ~jlhudd/wgac/maskOutGenFromLowCase.pl fasta/{} mask_out/{}.out
 
 echo "Fuguize sequences"
 mkdir -p fugu
