@@ -77,9 +77,9 @@ echo Output: $OUTPUT
 echo Copying files to nodes
 # Create tmp directory on cluster nodes and copy BlastDB files to nodes.
 mpirun -mca btl ^openib -np $NSLOTS \
-  /net/eichler/vol4/home/jlhudd/src/rsync_mpi/rsync_mpi.py \
-  "$DATABASE_PATH.[^q]*" "$BLAST_TMP_DIR" \
-  --pre_sync_commands="mkdir -p $BLAST_TMP_DIR"
+  /net/gs/vol1/home/psudmant/local_installations/bin/python /net/eichler/vol7/home/psudmant/EEE_Lab/projects/batch_node_copy/code/batch_node_copy.py \
+  --source "$DATABASE_PATH.[^q]*" --dest "$BLAST_TMP_DIR" \
+  --pre_sync_commands "mkdir -p $BLAST_TMP_DIR"
 
 # Run BLAST.
 echo Running BLAST
