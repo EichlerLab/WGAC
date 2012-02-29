@@ -17,7 +17,7 @@ export PATH=/net/eichler/vol7/home/psudmant/local_installations/bin:$PATH
 export MANPATH=$MANPATH:/usr/lib64/openmpi/1.4-gcc/man
 export PYTHONPATH=/net/gs/vol2/home/psudmant/local_installations/lib/python2.6/site-packages:$PYTHONPATH
 
-#$ -pe orte 10-30
+#$ -pe orte 50-100
 
 # Send an email when the script begins, ends, aborts, or suspends.
 #$ -m beas
