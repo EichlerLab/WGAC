@@ -18,7 +18,7 @@ export PATH=$PATH:/usr/lib64/openmpi/1.4-gcc/bin
 export MANPATH=$MANPATH:/usr/lib64/openmpi/1.4-gcc/man
 
 # pe request
-#$ -pe orte 5-10
+#$ -pe orte 20-50
 
 # Send an email when the script begins, ends, aborts, or suspends.
 #$ -m beas
