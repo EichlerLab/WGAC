@@ -23,7 +23,10 @@ else
 fi
 
 # Get a list of all contigs.
-cut -f 2 "$FASTALENGTH" | sed '1d;$d' > "$OUTPUT"
+cut -f 2 "$FASTALENGTH" | sed '1d;$d' | sort -k 1,1 > "$OUTPUT"
+sort -k 1,1 -o ${INTER} ${INTER}
+sort -k 1,1 -o ${INTRA} ${INTRA}
+sort -k 1,1 -o ${ALL} ${ALL}
 
 # Join all files on contig name.
 join -t '	' -a 1 -j 1 -o 1.1 2.2 -e "0" "$OUTPUT" "$INTER" > tmp && mv -f tmp "$OUTPUT"
