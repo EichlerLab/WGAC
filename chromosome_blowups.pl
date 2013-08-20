@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/bin/env perl
 use strict 'vars';
 use Getopt::Long;
 use File::Copy;
