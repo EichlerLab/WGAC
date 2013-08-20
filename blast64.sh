@@ -4,39 +4,34 @@
 #
 # Usage: qsub -q all.q blast64.sh -i <INPUT> -o <OUTPUT> -b <BLASTDB>
 
+. /etc/profile.d/modules.sh
+
+if test ! -z $MODULESHOME; then
+   module load modules modules-init modules-gs/prod modules-eichler/prod
+   module load openmpi/1.5.4
+fi
+
+module load python/2.7.2
+
 # Specify the shell for this job
 #$ -S /bin/bash
-
-export MPICH_PROCESS_GROUP=no 
-export P4_RSHCOMMAND=/usr/bin/rsh 
-export JOBDIR=$TMPDIR/work
-
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/openmpi/1.4-gcc/lib
-export PATH=$PATH:/usr/lib64/openmpi/1.4-gcc/bin
-export PATH=/net/eichler/vol7/home/psudmant/local_installations/bin:$PATH
-export MANPATH=$MANPATH:/usr/lib64/openmpi/1.4-gcc/man
-export PYTHONPATH=/net/gs/vol2/home/psudmant/local_installations/lib/python2.6/site-packages:$PYTHONPATH
-
 #$ -pe orte 50-100
 
 # Send an email when the script begins, ends, aborts, or suspends.
 #$ -m beas
 
 #$ -l h_vmem=8G
-#$ -l disk_free=4G
+#$ -l disk_free=20G
 
 # The job is located in the current working directory.
 #$ -cwd
-
-echo "Got $NSLOTS slots"
-echo "path=$PATH"
-echo "P4_RSHCOMMAND=$P4_RSHCOMMAND"
 
 WORKING_DIR=$SGE_O_WORKDIR
 INPUT="$WORKING_DIR/fugu"
 OUTPUT="$WORKING_DIR/blastout"
 DATABASE_PATH="$WORKING_DIR/blastdb/bofugu"
 BLAST_TMP_DIR=/var/tmp/blastdb
+TMP_DIR=/var/tmp
 
 # Get options from the user.
 while getopts :i:o:b:t: OPTION
@@ -61,7 +56,7 @@ do
     :)
       echo "Option -$OPTARG requires an argument." >&2
       exit 1
-      ;;      
+      ;;
   esac
 done
 
@@ -73,21 +68,25 @@ echo Database path: $DATABASE_PATH
 echo Tmp path: $BLAST_TMP_DIR
 echo Input: $INPUT
 echo Output: $OUTPUT
+echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
 
 echo Copying files to nodes
 # Create tmp directory on cluster nodes and copy BlastDB files to nodes.
-mpirun -mca btl ^openib -np $NSLOTS \
-  /net/gs/vol1/home/psudmant/local_installations/bin/python /net/eichler/vol7/home/psudmant/EEE_Lab/projects/batch_node_copy/code/batch_node_copy.py \
+mpirun -x PATH -x LD_LIBRARY_PATH \
+  --prefix $MPIBASE -mca plm ^rshd \
+  -mca btl ^openib \
+  python /net/eichler/vol4/home/jlhudd/src/rsync_mpi/batch_node_copy.py \
   --source "$DATABASE_PATH.[^q]*" --dest "$BLAST_TMP_DIR" \
   --pre_sync_commands "mkdir -p $BLAST_TMP_DIR"
 
 # Run BLAST.
 echo Running BLAST
-mpirun -mca btl ^openib \
-  -np $NSLOTS \
+mpirun -x PATH -x LD_LIBRARY_PATH \
+  --prefix $MPIBASE -mca plm ^rshd \
+  -mca btl ^openib \
   /net/eichler/vol4/home/jlhudd/bin/general_pipe \
   "/net/eichler/vol2/local/bin/blastall -p blastn -i dummy_in -o dummy_out -d $BLAST_TMP_DIR/$DATABASE_NAME -v 5000 -b 5000 -G 180 -E 1 -q -80 -r 30 -e 1e-30 -F F -z 3000000000 -Y 3000000000" \
-  $INPUT $OUTPUT ".bo" $TMPDIR
+  $INPUT $OUTPUT ".bo" $TMP_DIR
 
 echo Done
 
