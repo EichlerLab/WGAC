@@ -68,10 +68,10 @@ while (<CHR>) {
 close(CHR);
 
 # Define indices for necessary columns in the input file.
-my $min_percent_index = 10;
-my $min_bp_size_index = 8;
-#my $min_percent_index = 27;
-#my $min_bp_size_index = 22;
+#my $min_percent_index = 10;
+#my $min_bp_size_index = 8;
+my $min_percent_index = 27;
+my $min_bp_size_index = 22;
 my $chr_first_index = 0;
 my $chr_second_index = 4;
 
