@@ -55,6 +55,10 @@ while (<CHR>) {
     chomp;
     ($chromosome, $length) = split(/\t/);
 
+    if ($chromosome eq "seqname") {
+        next;
+    }
+
     # Save the length by chromosome name.
     $len{$chromosome} = $length;
 
