@@ -77,6 +77,7 @@ my $chr_second_index = 4;
 
 my $outdir = "starburst.S$min_bp_size.P$min_percent";
 mkdir $outdir;
+print "Outdir: $outdir\n";
 foreach my $chr (@chr) {
     # collect alignments need to draw
     # just intrachromosomal and interchromosomal for a specific chromosome
