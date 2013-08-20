@@ -36,7 +36,7 @@ my $min_percent=$ARGV[3];
 my $automate = $ARGV[5];
 my $chromosome_lengths_file = $ARGV[6];
 
-my $bp_spacing=10000000;
+my $bp_spacing=150000000;
 my $scaled_length=1818000000;
 my $screen_width=$scaled_length+3000000;
 # my $bp_spacing=20000000;
