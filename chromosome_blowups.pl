@@ -176,13 +176,13 @@ foreach my $chr (@chr) {
         print "Couldn't find any data for show line. Skipping $chr.\n";
         next;
     }
-    
-    my $command= "parasight71.pl  -show $these_chrs -arrange file:chr.layout -extra chr.extras -align chr.alignments";
-    
-    $command .= " -options '-pair_level=>intra_over_inter, -seq_names_size=>16, -sub_on=>0, -seq_space_paragraph=>120, -seq_space_wrap=>120,-pair_intra_line_on=>1, -pair_inter_line_on=>1, -pair_type_col=>0, -pair_type_col2=>4,-seq_tick_whole=>0, -seq_names_pattern=>chr(\\w+), -seq_tick_on=>0,-seq_tick_b_on=>0, -seq_tick_e_on=>0, -filename_on=>0, -screen_bpwidth =>$screen_width '";
-    
-    $command .= " -precode '\$canvas->raise(inter); \$canvas->raise(intra); \$canvas->raise(seqn); &print_screen(0); '  ";
-    
+
+    my $command= "parasight751.pl  -showseq $these_chrs -arrangeseq file:chr.layout -extra chr.extras -align chr.alignments -template ~jlhudd/wgac/parasight/blowups.pst";
+
+    $command .= " -options '-pair_level=>intra_over_inter, -sub_on=>0, -pair_intra_line_on=>1, -pair_inter_line_on=>1, -pair_type_col=>0, -pair_type_col2=>4,-seq_tick_whole=>0, -seq_tick_on=>0,-seq_tick_b_on=>0, -seq_tick_e_on=>0, -filename_on=>0'";
+
+    $command .= " -precode '&fitlongestline; \$canvas->raise(inter); \$canvas->raise(intra); \$canvas->raise(seqn); &print_screen(0); '  ";
+
     $command .=" -die" if($automate == 1);
 
     print "$command\n";
