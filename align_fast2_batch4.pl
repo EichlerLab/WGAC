@@ -58,7 +58,7 @@ $ppath="";
 $ppath="perl /binp/" if $^O eq "MSWin32";
 ###GET OPTIONS
 getopts('t:i:j:p:f:o:n:j:u:l:r:s:d:x:b:');
-print "INPUT FASTAS AT $opt_f\n";
+print STDERR "INPUT FASTAS AT $opt_f\n";
 open (TABLE, "$opt_t") || die "Can't open table $opt_t\n!";
 $temp = <TABLE>; #header row#
 $opt_l ||= 60000;
@@ -66,7 +66,7 @@ $opt_r ||=1;
 $opt_b ||='';
 if ($opt_b) {
 	$opt_b = "-b $opt_b";
-	print "$opt_b\n";
+	print STDERR "$opt_b\n";
 }
 $opt_d ||= 9999999999999;
 $opt_u ||='alignfast:random';
@@ -92,13 +92,13 @@ $row=$opt_r-1;
 while (<TABLE>) {
 	$row++;
 	my $newdirnum=int (($row-0.8)/$opt_d);
-	print "ROW:$row  NEWDIRNUM $newdirnum  ODNUM:$odnumber\n";
+	print STDERR "ROW:$row  NEWDIRNUM $newdirnum  ODNUM:$odnumber\n";
 	if ($newdirnum > $odnumber) {
 		$odnumber=substr ("0000".$newdirnum,-4);
 		system "mkdir $opt_o/$odnumber";
-		print "MAKING NEW DIRECTORY $opt_o/$odnumber\n";
+		print STDERR "MAKING NEW DIRECTORY $opt_o/$odnumber\n";
 	}
-	print "######ROW $row ... \n";
+	print STDERR "######ROW $row ... \n";
 	chomp;
 	my @col = split "\t";
 	
@@ -109,16 +109,15 @@ while (<TABLE>) {
 	if ($opt_x ne '') {
 		$name=$col[$opt_x];
 	}
-	
+
 	##TEST FOR EXISTENCE#
 	if (-e "$opt_o/$odnumber/$name") {
-		print "    ...already exists in ($opt_o/$odnumber).\n";
+		print STDERR "    ...already exists in ($opt_o/$odnumber).\n";
 		next;
 	}
-
 	my $exitcode = system "mkdir $tmpdir/$name";
 	if ($exitcode != 0) {
-		print "    ...another processor is already working on it.\n";
+		print STDERR "    ...another processor is already working on it.\n";
 		next;
 	}
 	
@@ -144,15 +143,15 @@ while (<TABLE>) {
 	$s2=$col[$s2] if $s2 ne '';
 	$b2=$col[$b2] if $b2 ne '';
 	$e2=$col[$e2] if $e2 ne '';
-	print "$s1 $b1-$e1  $s2 $b2-$e2\n";
+	print STDERR "$s1 $b1-$e1  $s2 $b2-$e2\n";
 	##CHECK FOR FASTA FILES#
 	my $path1 = &find_file($opt_f, '',$s1, ':_000:_0000');
 	if ($opt_b) {
 		$path1 =~ s/_0{3,4}$//;  # remove 3 or 4 zeroes
 	}
-	print "FOUND $path1\n";
+	print STDERR "FOUND $path1\n";
 	if (!$path1 ) {
-		print "S1:$s1 doesn't exist--Skipping ($opt_f $s1)\n";
+		print STDERR "S1:$s1 doesn't exist--Skipping ($opt_f $s1)\n";
 		next;
 	}
 	
@@ -160,9 +159,9 @@ while (<TABLE>) {
 	if ($opt_b) {
 		$path2 =~ s/_0{3,4}$//; # remove 3 or 4 zeroes
 	}
-	print "FOUND $path2\n";
+	print STDERR "FOUND $path2\n";
 	if (!$path2) {
-		print "S2:$s2 doesn't exist--Skipping ($opt_f)\n";
+		print STDERR "S2:$s2 doesn't exist--Skipping ($opt_f)\n";
 		next;
 	}
 
@@ -173,7 +172,7 @@ while (<TABLE>) {
 	} else {
 	
 		if ($b1 eq "" || $b2 eq "" || $e1 eq "" || $e2 eq "") {
-			print "Missing numbers for b1 $b1 b2 $b2 e1 $e1 e2 $e2\n";
+			print STDERR "Missing numbers for b1 $b1 b2 $b2 e1 $e1 e2 $e2\n";
 			next;
 		}
 		###ADD EXTRA BASES TO AN ALIGNMENT###
@@ -200,21 +199,22 @@ while (<TABLE>) {
 		$frag2=":$b2:$e2";
 	}
 	
-	print "#RUN ALIGN_FASTA3.PL#\n";
-	chdir "$tmpdir/$name";
-	system "ls";
+	print STDERR "#RUN ALIGN_FASTA3.PL#\n";
+	#chdir "$tmpdir/$name";
+	#system "ls";
 	my $ofilename="$maindir/$opt_o/$odnumber/$name";
 	my $command= "$FindBin::Bin/align_fast3.pl -i $path1$frag1 -j $path2$frag2 -l $opt_l -o $ofilename -f -40 -g -1 $opt_b";
 	#eray changed removed the maindirs before path1 and path2
-	system "$command";
-	print "COMMAND $command\n\n";
-	chdir "$maindir"; 
+	print "mkdir -p $maindir/$tmpdir/$name;cd $maindir/$tmpdir/$name;$command;cd $maindir;rm -rf $maindir/$tmpdir/$name\n";  
+	print STDERR "COMMAND $command\n";
+	
 
-	for (my $i=0; $i<20000; $i++) { $i=$i}; #pause to allow exit
+	
 
 	# allow another processor to finish using tmpdir/name, if files exist within this subdirectory
 	#system "rm -rf $tmpdir/$name";
-	system "rmdir --ignore-fail-on-non-empty $tmpdir/$name"; 
+	#system "rmdir --ignore-fail-on-non-empty $tmpdir/$name";
+	 
 	
 }
 
@@ -228,7 +228,7 @@ sub find_file {
 	my @names=split ":",$names;
 	my @extensions=split /:/,$extensions;
 	@extensions=("") if !@extensions;
-	print join ("XXX", @extensions), "\n";
+	print STDERR join ("XXX", @extensions), "\n";
 	for my $path (@paths) {
 	 for my $sub_path (@sub_paths) {
 	 	for my $name (@names) {
@@ -237,7 +237,7 @@ sub find_file {
 	 			$p .= "/$sub_path" if $sub_path;
 	 			$p .= "/$name$ext";
 	 			#my $wpd=`wpd`;
-	 			print "TESTING $p\n";
+	 			print STDERR "TESTING $p\n";
 	 		
 	 			return $p if (-e $p);
 	 		}
