@@ -78,13 +78,13 @@ my $chr_second_index = 4;
 my $outdir = "starburst.S$min_bp_size.P$min_percent";
 mkdir $outdir;
 foreach my $chr (@chr) {
-    # collect alignments need to draw 
+    # collect alignments need to draw
     # just intrachromosomal and interchromosomal for a specific chromosome
     next if(!($chr_show eq "all" || $chr_show eq $chr));
-    
+
     my $scale=0;  # stores the scaling for the chromosomes
     my $spot=1;
-    
+
     $scale= $scaled_length/$len{$chr};
     print "REMOVING GAPS THAT ARE NOT CHROMOSOME ($chr)\n";
     open (CHR, $gapfile) || die "Can't read Npositions_chr19.tbl!\n";
@@ -96,11 +96,11 @@ foreach my $chr (@chr) {
         s/\r\n/\n/;
         chomp;
         my @c = split /\t/;
-        next if $c[0] ne $chr && $c[3] eq 'white';  
+        next if $c[0] ne $chr && $c[3] eq 'white';
         if ($c[0] eq $chr) {
             $c[1]= int ($c[1]*$scale);
             $c[2]= int ($c[2]*$scale);
-        
+
         }
 
         if(defined($c[6]) && $c[6] ne ''){
@@ -115,7 +115,7 @@ foreach my $chr (@chr) {
 
     close CHR;
     close OUT;
-  
+
     print "REMOVING ALIGNMENTS THAT ARE NOT CHROMOSOME ($chr)\n";
     open (CHR, $alignfile) || die "Can't read alignment.pieces!\n";
     open (OUT, ">chr.alignments") || die "Can't write chr.alignments!\n";
@@ -154,7 +154,7 @@ foreach my $chr (@chr) {
             print OUT "$chr\t1\n";
             print OUT "NEWLINE\n";
             $spot=1;
-            
+
         }
 
     }
@@ -164,11 +164,11 @@ foreach my $chr (@chr) {
         next if !defined $chrpair{$c};
         if ($c eq $chr) {
             $these_chrs.="$c,$scaled_length:";
-            
+
         } else {
             $these_chrs.="$c,$len{$c}:";
         }
-    
+
     }
 
     if (length($these_chrs) == 0) {
@@ -183,7 +183,7 @@ foreach my $chr (@chr) {
     $command .= " -precode '\$canvas->raise(inter); \$canvas->raise(intra); \$canvas->raise(seqn); &print_screen(0); '  ";
     
     $command .=" -die" if($automate == 1);
-    
+
     print "$command\n";
     system $command;
     my $kb=int($min_bp_size/1000);
@@ -198,7 +198,7 @@ Jeff Bailey (jab@cwru.edu, http:)
 =head1 ACKNOWLEDGEMENTS
 
 This software was developed in the laboratory of:
- Dr. Evan Eichler 
+ Dr. Evan Eichler
  Department of Genetics,
  Case Western Reserve University and School of Medicine
  Cleveland OH 44106
