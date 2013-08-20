@@ -19,12 +19,12 @@ blastparser42.pl -in ./blastout \
   -filter '-min_bpalign=>250, -min_fracbpmatch=>0.88, -max_%gap =>40, -no_subject_self => yes, -no_doubleoverlap=>score'
 
 echo "Parse self-blast"
-rm -rf fugu2
 mkdir -p tmp
 blast_lav_break_self_overlap2.pl --in selfblast --out tmp
 mkdir -p data
 blast_lav_hit_by_hit.pl --in tmp --out data/lav_int2.parse -options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
 rm -rf tmp
+rm -rf fugu2
 
 echo "Merge parsed blast results"
 cd data
