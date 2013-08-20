@@ -5,42 +5,36 @@
 # Usage: qsub -q all.q trim-ends.sh -i <INPUT> -f <FASTA FILES> -o <OUTPUT>
 
 # Specify the shell for this job
-#$ -S /bin/bash 
+#$ -S /bin/bash
 
-export MPICH_PROCESS_GROUP=no
+set -e
+
+. /etc/profile.d/modules.sh
+
+if test ! -z $MODULESHOME; then
+   module load modules modules-init modules-gs modules-eichler
+   module load openmpi/1.5.3
+fi
+
+module load python/2.7.2
+
 export P4_RSHCOMMAND=/usr/bin/rsh
 export PRINT_SEQUENCES=2
 export C3_RSH='rsh -q'
 ulimit -c 0
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/openmpi/1.4-gcc/lib
-export PATH=$PATH:/usr/lib64/openmpi/1.4-gcc/bin
-export MANPATH=$MANPATH:/usr/lib64/openmpi/1.4-gcc/man
-
-# pe request
 #$ -pe orte 20-50
-
-# Send an email when the script begins, ends, aborts, or suspends.
-#$ -m beas
-#$ -hard 
+#$ -l disk_free=10G
 
 # Location of executables
 progpath=/mnt/local/bin
-echo "Got $NSLOTS slots" 
-echo "path=$PATH" 
-echo "P4_RSHCOMMAND=$P4_RSHCOMMAND" 
-echo "machine_file=$TMPDIR/machines" 
-echo "JOB_ID=$JOB_ID" 
-echo "TEMDPIR=$TMPDIR" 
+echo "Got $NSLOTS slots"
+echo "path=$PATH"
+echo "P4_RSHCOMMAND=$P4_RSHCOMMAND"
+echo "machine_file=$TMPDIR/machines"
+echo "JOB_ID=$JOB_ID"
+echo "TEMDPIR=$TMPDIR"
 echo "HOSTNAME=$HOSTNAME"
-#sort -u -o $TMPDIR/Mfile $TMPDIR/machines
-#echo $HOSTNAME >> $TMPDIR/Mfile
-#thisslots=`wc -l $TMPDIR/Mfile|awk '{print $1}'`
-#echo "thisslots=$thisslots"
-#4std; mean: 209.57; std: 13.40
-
-#First agrument is the command
-#command="\"perl /net/eichler/vol5/home/ssajjadi/wgacbin/step_8_mpi/Trim.pl\"";
 
 # Set defaults.
 WORKING_DIR=$SGE_O_WORKDIR
@@ -68,11 +62,23 @@ do
     :)
       echo "Option -$OPTARG requires an argument." >&2
       exit 1
-      ;;      
+      ;;
   esac
 done
 
-mpirun -mca btl ^openib -np $NSLOTS \
+# Create tmp directory on cluster nodes and make sure it's empty.
+TRIM_TMP_DIR=/tmp/endtrim
+
+mpirun -x PATH -x LD_LIBRARY_PATH \
+  --prefix $MPIBASE -mca plm ^rshd \
+  -mca btl ^openib python /net/eichler/vol4/home/jlhudd/src/rsync_mpi/batch_node_copy.py \
+  --source "~jlhudd/wgac/trim-ends.sh" --dest "/dev/null" \
+  --pre_sync_commands "rm -rf ${TRIM_TMP_DIR}; mkdir -p ${TRIM_TMP_DIR}"
+
+echo "Trimming ends"
+mpirun -x PATH -x LD_LIBRARY_PATH \
+  --prefix $MPIBASE -mca plm ^rshd \
+  -mca btl ^openib \
   /net/eichler/vol4/home/jlhudd/wgac/trim_ends/runTrim \
   "perl /net/eichler/vol4/home/jlhudd/wgac/trim_ends/Trim.pl" \
   $INPUT $FASTA $OUTPUT $JOB_ID
