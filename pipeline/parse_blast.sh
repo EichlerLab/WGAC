@@ -38,7 +38,12 @@ blast_defuguize_hit_by_hit.pl -t data/both.parse -d .
 echo "Prepare for end trimming"
 cd data
 mkdir -p step_8_mpi/defugu
-perl ~jlhudd/wgac/split.pl both.parse.defugu 300 98300
+
+# Second argument is number of lines per output file. The third argument is the
+# number of lines in the defugu file.
+DEFUGU_LINES=`wc -l both.parse.defugu | sed 's/\s\+/\t/g' | cut -f 1`
+perl ~jlhudd/wgac/split.pl both.parse.defugu 300 $DEFUGU_LINES
+
 find newdir/ -type f -exec cp {} step_8_mpi/defugu \;
 rm -rf newdir
 mkdir -p step_8_mpi/trim
