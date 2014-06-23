@@ -55,7 +55,7 @@ while (<CHR>) {
     chomp;
     ($chromosome, $length) = split(/\t/);
 
-    if ($chromosome eq "seqname") {
+    if ($chromosome =~/(seqname|seqName)/) {
         next;
     }
 
