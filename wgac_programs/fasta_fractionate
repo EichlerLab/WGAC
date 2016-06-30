@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+#LOAD MODULES
+
+use Getopt::Std;
+use strict 'vars';
+
+
+
+
+use vars qw($true $false);
+use vars qw($opt_f $opt_u $opt_s $opt_o $opt_a $path @files);
+use vars qw($header $a $c $t $g $n $totbases);
+use vars qw($piece $position $b $e);
+
+use vars qw($program $pversion $pdescription $pgenerate);
+$program = "$0";
+$program =~ s/^.*\///;
+### program stats ###
+$pversion='0.010111';
+$pdescription = "$program (ver:$pversion) fractionates/aliquots (or breaks in to equal pieces) fasta record(s)";
+$pgenerate= 'jeff:dnhc genetics:dnh';
+### program stats end ###
+#print "usage: $program -in [path] -out [path] [options]\n";
+#
+
+#html
+#nullarg
+#code
+#description
+
+if ($ARGV[0] eq '-h' || $ARGV[0] eq '-help') {
+	system "perldoc $0\n";
+	exit;
+}
+
+
+
+if ($ARGV[0] eq '') {
+
+	print "USAGE\n$program -f [path] -out [path] [options]\n";
+	print "DESCRIPTION\n$pdescription\n";
+	print "ARGUMENTS\n";
+	print "-f [file or dir path] to fasta file(s) to fractionate\n";
+	print "-s [integer] size in base pairs for each piece\n";
+	print "-o [path] directory to store output in (current) by default\n";
+	print "-a [switch] append only new files (i.e. skip if _000 exists\n";
+	print "  (size must be greater than smallest row in fasta record)\n";
+	die "***********************************************************\n";
+}
+getopts('f:s:o:au');
+$opt_f || die "Please input a proper fasta file or directory  with -f.\n";
+$opt_s || die "Please input the size of the pieces to break the sequence into with -s.\n";
+$opt_o || ($opt_o = ".");
+if (opendir (DIR, $opt_f) ) {
+	@files = grep { /[a-zA-Z0-9]/ } readdir DIR;
+	close DIR;
+	$path = $opt_f;
+} elsif (open (IN, $opt_f)) {
+	($path ) = $opt_f =~ /(^.*)\//;
+	$opt_f=~ s/^.*\///;
+	@files=($opt_f);
+} else {
+	die "-f  ($opt_f)  not a file and not a directory\n";
+}
+my $counter=0;
+FILE: foreach my $f (@files) {
+	print ++$counter," $f===>\n";
+	next if -e ("$opt_o/$f"."_000") && $opt_a;
+	#my $pause=<STDIN>;
+	#####CALCULATE TOTAL LENGTH #######
+	open (FASTA,"$path/$f") || die "Can not open fasta file $path/$f\n";
+	$header=<FASTA>;
+	$totbases=$a=$g=$c=$t=$n=0;
+	die ("File does not contain a fasta header!\n") if $header !~/^>/;
+	while ( <FASTA> ) {
+		s/\r\n/\n/;
+		s/ +//;
+		chomp;
+		chomp;
+		$_ = uc($_) if !$opt_u;
+		$totbases += length;
+		$a+= tr/A/A/;
+		$g+= tr/G/G/;
+		$c+= tr/C/C/;
+		$t+= tr/T/T/;
+		$n+= tr/N/N/;
+
+	}
+	print "TOTAL BASE PAIRS: $totbases A:$a C:$c G:$g T:$t N:$n O:",$totbases-$a-$c-$g-$t-$n,"\n";
+	close FASTA;
+	open (FASTA,"$path/$f") || die "Can not open fasta file $path/$f\n";
+
+	$header= <FASTA>;
+	$piece=0;
+
+
+	$b=1; $e = $opt_s; $position=0;
+	print "FRACTIONATING...\n";
+	print "\tPOSITION\t$b\t$e   =>  >$f" , "_000\n";
+	open (OUT, ">$opt_o/$f" . "_000");
+	print OUT ">$f". "_000\n";
+	while ( <FASTA> ) {
+
+		s/\r\n/\n/;
+		s/ +//;
+		chomp; chomp;
+		$position += length;
+		if ($position >= $e) {
+			print OUT substr($_,0,$e-($position-length)), "\n";
+			substr($_,0,$e-($position-length)) ='';
+			close OUT;
+			if ($e < $totbases && $e < $totbases) {
+				$piece++;
+				($b,$e)=($piece*$opt_s+1,($piece+1)*$opt_s);
+				$e= $totbases if ($e > $totbases);
+				my $name= "0000000".$piece;
+				$name = substr($name, length($name)-3,3);
+				print "\tPOSITION\t$b\t$e   => >$f","_$name\n";
+				open (OUT, ">$opt_o/$f"."_$name");
+				print OUT ">$f","_$name\n";
+			} else {
+				last;
+			}
+		}
+
+		print OUT $_,"\n" if $_ ne "";
+	}
+	close OUT;
+	close FASTA;
+	$piece++;
+	print "Number of pieces created: $piece\n";
+}
+	
+
+
+
