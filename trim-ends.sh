@@ -72,7 +72,7 @@ TRIM_TMP_DIR=/tmp/endtrim
 mpirun -x PATH -x LD_LIBRARY_PATH \
   --prefix $MPIBASE -mca plm ^rshd \
   -mca btl ^openib python /net/eichler/vol4/home/jlhudd/src/rsync_mpi/batch_node_copy.py \
-  --source "~jlhudd/wgac/trim-ends.sh" --dest "/dev/null" \
+  --source "/net/eichler/vol4/home/jlhudd/wgac/trim-ends.sh" --dest "/dev/null" \
   --pre_sync_commands "rm -rf ${TRIM_TMP_DIR}; mkdir -p ${TRIM_TMP_DIR}"
 
 echo "Trimming ends"

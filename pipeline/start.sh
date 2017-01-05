@@ -20,7 +20,7 @@ fasta_fractionate -f fastawhole -s 400000 -o fasta
 
 echo "Get mask out from lowercase letters"
 mkdir -p mask_out
-ls fasta | xargs -i perl ~jlhudd/wgac/maskOutGenFromLowCase.pl fasta/{} mask_out/{}.out
+ls fasta | xargs -i perl /net/eichler/vol4/home/jlhudd/wgac/maskOutGenFromLowCase.pl fasta/{} mask_out/{}.out
 
 echo "Fuguize sequences"
 mkdir -p fugu
@@ -34,7 +34,7 @@ rm -f blastdb/bofugu
 
 echo "Submit blast job to cluster"
 mkdir -p blastout
-qsub -N "${SPECIES}_wgac" -q all.q ~jlhudd/wgac/blast64.sh -t "/var/tmp/jlhudd/${SPECIES}_wgac"
+qsub -N "${SPECIES}_wgac" -q all.q /net/eichler/vol4/home/jlhudd/wgac/blast64.sh -t "/var/tmp/jlhudd/${SPECIES}_wgac"
 
 echo "Prepare fugu sequences for self-blast"
 cp -r fugu fugu2
