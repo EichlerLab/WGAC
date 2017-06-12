@@ -12,7 +12,7 @@
 #           if                       32bit,                         32-bit cluster (eee)
 #           otherwise, skip cexec and run Perl program on single node to wrap up loose ends
 
-scriptName='/net/eichler/vol2/home/dgordon/wgac/github/wgac/align_fast2_batch4.pl'
+scriptName='/net/eichler/vol2/home/dgordon/wgac/github/WGAC/align_fast2_batch4.pl'
 
 scriptParams='-u both:random -n both -d 5000 -b 400000 -i 0:1:2 -j 4:5:6 -t data/both.parse.defugu.trim.fixed.trim.defrac -o data/align_both';
 
