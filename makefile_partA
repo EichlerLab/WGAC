@@ -10,6 +10,7 @@ TRIM_SPECIES=lemur
 #
 
 
+all : fugu2 data/bo_self.parse
 
 fugu2 : fugu
 	cp -r $^ $@
