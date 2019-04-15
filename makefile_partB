@@ -1,7 +1,7 @@
 FASTAWHOLE_DIR=fastawhole
-REPEATMASKER_SPECIES=lemur
-BLAST_SEED_SIZE=500
-TRIM_SPECIES=lemur
+REPEATMASKER_SPECIES=primates
+BLAST_SEED_SIZE=250
+TRIM_SPECIES=primates
 # Run the pipeline as follows:
 #
 #  1. make Masking
@@ -29,28 +29,28 @@ all : fastalength.log fasta mask_out fugu blastdb/bofugu.nsq blastout data/bo_se
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
 plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
-	pushd stats; Rscript ~jlhudd/pipelines/wgac/plot.R; popd;
+	pushd stats; Rscript /net/eichler/vol4/home/jlhudd/pipelines/wgac/plot.R; popd;
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
 
 stats/le94WGAC_only.tab : stats/le94WGAC.merged stats/gt94WGAC.merged
-	~jlhudd/wgac/twoPartOvp_mgsrt.pl -i $< -f -j $(lastword $^) -t -L -o $@
+	/net/eichler/vol4/home/jlhudd/wgac/twoPartOvp_mgsrt.pl -i $< -f -j $(lastword $^) -t -L -o $@
 
 stats/gt94WGAC.merged : stats/gt94WGAC.tab
-	~jlhudd/wgac/coordsMerger_sort.pl -i $< -n 0 -b 1 -e 2 -u -o $@
+	/net/eichler/vol4/home/jlhudd/wgac/coordsMerger_sort.pl -i $< -n 0 -b 1 -e 2 -u -o $@
 
 stats/gt94WGAC.tab : data/GenomicSuperDup.tab
 	awk 'OFS="\t" { if($$26>0.94) { print $$1,$$2,$$3 } }' $< > $@
 
 stats/le94WGAC.merged : stats/le94WGAC.tab
-	~jlhudd/wgac/coordsMerger_sort.pl -i $< -n 0 -b 1 -e 2 -u -o $@
+	/net/eichler/vol4/home/jlhudd/wgac/coordsMerger_sort.pl -i $< -n 0 -b 1 -e 2 -u -o $@
 
 stats/le94WGAC.tab : data/GenomicSuperDup.tab
 	awk 'OFS="\t" { if($$26<=0.94) { print $$1,$$2,$$3 } }' $< > $@
 
 stats/mergedWGAC.tab : stats/allWGAC.tab
-	~jlhudd/wgac/coordsMerger_sort.pl -i $< -n 0 -b 1 -e 2 -u -o $@
+	/net/eichler/vol4/home/jlhudd/wgac/coordsMerger_sort.pl -i $< -n 0 -b 1 -e 2 -u -o $@
 
 stats/allWGAC.tab : data/GenomicSuperDup.tab
 	cut -f 1-3 $< > $@
@@ -59,7 +59,7 @@ stats/length_similarity_kimura : data/oo.weild10kb.join.all.cull
 	cut -f 23,28,34 $< > $@
 
 stats/all_stats.tab : fastalength.log stats/inter_all_dup stats/intra_all_dup stats/all_all_dup
-	~jlhudd/wgac/nr_report.sh $^ $@
+	/net/eichler/vol4/home/jlhudd/wgac/nr_report.sh $^ $@
 
 stats/all_all_dup : stats/oneHitPerLine_sort
 	groupBy -i $< -g 1 -c 5 -o sum > $@
@@ -71,19 +71,19 @@ stats/inter_all_dup : stats/interSort
 	groupBy -i $< -g 1 -c 5 -o sum > $@
 
 stats/nr_stats.tab : fastalength.log stats/interDupLen stats/intraDupLen stats/AllDupLen
-	~jlhudd/wgac/nr_report.sh $^ $@
+	/net/eichler/vol4/home/jlhudd/wgac/nr_report.sh $^ $@
 
 stats/intraDupLen : stats/intraMerge
-	perl ~jlhudd/wgac/statLenPerChr.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/statLenPerChr.pl $< > $@
 
 stats/interDupLen : stats/interMerge
-	perl ~jlhudd/wgac/statLenPerChr.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/statLenPerChr.pl $< > $@
 
 stats/intraMerge : stats/intraSort
-	perl ~jlhudd/wgac/mergeHit.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/mergeHit.pl $< > $@
 
 stats/interMerge : stats/interSort
-	perl ~jlhudd/wgac/mergeHit.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/mergeHit.pl $< > $@
 
 stats/intraSort : stats/oneHitPerLine_sort
 	grep "intra" $< > $@
@@ -92,10 +92,10 @@ stats/interSort : stats/oneHitPerLine_sort
 	grep "inter" $< > $@
 
 stats/AllDupLen : stats/mergeHit
-	perl ~jlhudd/wgac/statLenPerChr.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/statLenPerChr.pl $< > $@
 
 stats/mergeHit : stats/oneHitPerLine_sort
-	perl ~jlhudd/wgac/mergeHit.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/mergeHit.pl $< > $@
 
 stats/oneHitPerLine_sort : stats/oneHitPerLine
 	sort -k 1,1 -k 2,2n $< > $@
@@ -106,10 +106,10 @@ stats/oneHitPerLine : data/oo.weild10kb.join.all.cull
 	perl ~ssajjadi/wgacbin/getLenStat4Cull.pl $< > stats/all.join.cull.lenDis
 	perl ~ssajjadi/wgacbin/getLenStat4Cull-2K.pl $< >stats/all.join.cull.lenDis_2K
 	perl ~ssajjadi/wgacbin/getSimStat4Cull-05.pl $< >stats/all.join.cull.simDis_05
-	perl ~jlhudd/wgac/oneHitPerLine.pl $< >$@
+	perl /net/eichler/vol4/home/jlhudd/wgac/oneHitPerLine.pl $< >$@
 
 data/GenomicSuperDup.tab : data/oo.weild10kb.join.all.cull
-	perl ~jlhudd/wgac/makeTrack.pl $< > $@
+	perl /net/eichler/vol4/home/jlhudd/wgac/makeTrack.pl $< > $@
 
 data/oo.weild10kb.join.all.cull : data/oo.weild10kb.join.all
 	~araja/Useful-Code/wgac/make_oo.weild10kb.join.all.cull.sh $< $@
@@ -126,12 +126,12 @@ data/both.alignscorerdata : data/align_both
 data/align_both : fasta data/both.parse.defugu.trim.fixed.trim.defrac
 	/net/eichler/vol18/araja/wgac/wgacAlign.sh fasta >sge_align_batch.sh
 	chmod +x sge_align_batch.sh
-	qsub -N global_align_$(TRIM_SPECIES) -pe orte 25 -q eichler-short.q -l h_rt=24:00:00 -sync y ~jlhudd/src/general_pipe/sge_commands.sh sge_align_batch.sh
+	qsub -N global_align_$(TRIM_SPECIES) -pe orte 25 -q eichler-short.q -l h_rt=24:00:00 -sync y /net/eichler/vol4/home/jlhudd/src/general_pipe/sge_commands.sh sge_align_batch.sh
 	rm -rf both_tmp/both*
 	rm -rf both_tmp
 	/net/eichler/vol18/araja/wgac/wgacAlign.sh fasta 110000 >sge_align_batch_110k.sh
 	chmod +x sge_align_batch_110k.sh
-	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -q eichler-short.q -l h_rt=16:00:00 -sync y ~jlhudd/src/general_pipe/sge_commands.sh sge_align_batch_110k.sh
+	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -q eichler-short.q -l h_rt=16:00:00 -sync y /net/eichler/vol4/home/jlhudd/src/general_pipe/sge_commands.sh sge_align_batch_110k.sh
 	rm -rf both_tmp
 
 data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawhole
@@ -141,18 +141,18 @@ data/both.parse.defugu.trim.fixed.trim : data/both.parse.defugu.trim
 	blast_align_by_align_overlap_fix3.pl -i $<
 
 data/both.parse.defugu.trim : data/step_8_mpi/trim
-	perl ~jlhudd/wgac/trim_ends/collectTrim.pl $<
+	perl /net/eichler/vol4/home/jlhudd/wgac/trim_ends/collectTrim.pl $<
 	mv data/step_8_mpi/trim/ParallelOutput.trim $@
 
 data/step_8_mpi/trim : data/step_8_mpi/defugu
 	mkdir -p $@
-	~araja/Useful-Code/wgac/make_trim_jobs.sh ${TRIM_SPECIES} >trim-ends_${TRIM_SPECIES}.sh
+	./make_trim_jobs.sh ${TRIM_SPECIES} >trim-ends_${TRIM_SPECIES}.sh
 	chmod +x trim-ends_${TRIM_SPECIES}.sh
-	qsub -N trim-ends_${TRIM_SPECIES} -pe orte 25 -q eichler-short.q -l h_rt=16:00:00 -sync y ~jlhudd/src/general_pipe/sge_commands.sh trim-ends_${TRIM_SPECIES}.sh
+	qsub -N trim-ends_${TRIM_SPECIES} -pe orte 25 -q eichler-short.q -l h_rt=16:00:00 -sync y /net/eichler/vol4/home/jlhudd/src/general_pipe/sge_commands.sh trim-ends_${TRIM_SPECIES}.sh
 
 data/step_8_mpi/defugu : data/both.parse.defugu
 	mkdir -p $@
-	perl ~jlhudd/wgac/split.pl $< 300 $(shell wc -l $<)
+	perl /net/eichler/vol4/home/jlhudd/wgac/split.pl $< 300 $(shell wc -l $<)
 	find newdir/ -type f -exec cp {} $@ \;
 	rm -rf newdir
 
