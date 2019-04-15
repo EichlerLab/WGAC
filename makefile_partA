@@ -1,7 +1,8 @@
 WGAC_GITHUB=/net/eichler/vol2/home/dgordon/wgac/github/WGAC/
 FASTAWHOLE_DIR=fastawhole
 REPEATMASKER_SPECIES=lemur
-BLAST_SEED_SIZE=500
+# Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
+BLAST_SEED_SIZE=250
 TRIM_SPECIES=lemur
 # This is the first step in the WGAC pipeline
 # This makefile is for running the pipeline to prepare fugu2 for
@@ -47,9 +48,14 @@ mask_out : fasta
 	ls $< |xargs -i perl ${WGAC_GITHUB}/maskOutGenFromLowCase.pl $</{} $@/{}.out
 	mkdir -p data
 
-fasta : fastawhole
+fasta : fastawholesplit
 	mkdir -p $@
 	fasta_fractionate -f $^ -s 400000 -o $@
+
+
+fastawholesplit : fastawhole
+	mkdir -p $@
+	cat fastawhole/* | ~/bin/split_fasta_file.py stdin -d fastawholesplit
 
 fastalength.log : fastawhole
 	fasta_length -d $^/ -o $@ -f
