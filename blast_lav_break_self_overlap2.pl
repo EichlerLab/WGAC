@@ -6,7 +6,8 @@ use strict 'vars';
 
 use Getopt::Long;
 use Data::Dumper;
-use lib '/home/xws/bin/JABPerlMod';
+use FindBin;
+use lib "$FindBin::Bin/JABPerlMod"; # subdirectory JABPerlMod should contain Blast.pm
 use Blast qw(&parse_query);
 
 use vars qw($true $false);
