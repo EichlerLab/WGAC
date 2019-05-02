@@ -56,7 +56,7 @@ fasta : fastawholesplit
 fastawholesplit : fastawhole
 	mkdir -p $@
 	cat fastawhole/* | ~/bin/split_fasta_file.py stdin -d fastawholesplit
-	rename "*.fasta" "" *
+	cd fastawholesplit && rename ".fasta" "" *
 
 fastalength.log : fastawhole
 	fasta_length -d $^/ -o $@ -f
