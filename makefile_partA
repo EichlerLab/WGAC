@@ -1,9 +1,9 @@
-WGAC_GITHUB=/net/eichler/vol2/home/dgordon/wgac/github/WGAC/
+WGAC_GITHUB=/net/eichler/vol27/projects/assemblies/nobackups/macaque/wgac4/WGAC
 FASTAWHOLE_DIR=fastawhole
-REPEATMASKER_SPECIES=lemur
+REPEATMASKER_SPECIES=primates
 # Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
 BLAST_SEED_SIZE=250
-TRIM_SPECIES=lemur
+TRIM_SPECIES=primates
 # This is the first step in the WGAC pipeline
 # This makefile is for running the pipeline to prepare fugu2 for
 # running on the Sun.  (DG, June 2017)
@@ -56,6 +56,7 @@ fasta : fastawholesplit
 fastawholesplit : fastawhole
 	mkdir -p $@
 	cat fastawhole/* | ~/bin/split_fasta_file.py stdin -d fastawholesplit
+	rename "*.fasta" "" *
 
 fastalength.log : fastawhole
 	fasta_length -d $^/ -o $@ -f
