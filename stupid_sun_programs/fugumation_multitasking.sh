@@ -1,1 +1,2 @@
-./fugumation_multitasking.pl -i /net/eichler/vol18/dgordon/wgac/hg19_from_vol26/fugu2 -o selfblast 2>&1 | tee selfblast.out
+mkdir -p selfblast
+./fugumation_multitasking.pl -i /home/dgordon/macaque_wgac4/fugu2 -o selfblast 2>&1 | tee selfblast.out
