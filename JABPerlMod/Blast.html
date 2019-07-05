@@ -1,0 +1,220 @@
+<HTML>
+<HEAD>
+<TITLE>Blast.pm</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#_parse_query_subroutine_in_Blast">&amp;parse_query subroutine in Blast.pm</A>
+	<UL>
+
+		<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+		<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+		<LI><A HREF="#HASH_STRUCTURE_AND_CONTENT">HASH STRUCTURE AND CONTENT</A>
+		<LI><A HREF="#PARSE_OPTIONS">PARSE OPTIONS</A>
+		<LI><A HREF="#FILTER_OPTIONS">FILTER OPTIONS</A>
+		<UL>
+
+			<LI><A HREF="#FILTERS_for_single_hsp_independ">FILTERS for single hsp (independent of other hsps)</A>
+			<LI><A HREF="#FILTERS_based_on_other_hsps">FILTERS based on other hsps</A>
+			<LI><A HREF="#FILTERS_for_various_higher_level">FILTERS for various higher level query or subject interactions</A>
+		</UL>
+
+	</UL>
+
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</A>
+	<LI><A HREF="#COPYRIGHT">COPYRIGHT</A>
+	<LI><A HREF="#DISCLAIMER">DISCLAIMER</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="_parse_query_subroutine_in_Blast">&amp;parse_query subroutine in Blast.pm</A></H1>
+<P>
+<HR>
+<H2><A NAME="SYNOPSIS">SYNOPSIS</A></H2>
+<P>
+A call to this subroutine parses a query and returns a hash containing all
+of the parsed data. Here is a short bit of code to get you started. Pass a
+filehandle glob and set any need values or filters. Just a few of the
+possible filters are used in this example
+
+<P>
+<PRE> use lib '/JABPerlMod';    # directory where Blast.pm is stored
+ use Blast qw(&amp;parse_query); 
+ while ( !eof(IN) ) {
+    my %q = %{ &amp;parse_query( FILEHANDLE =&gt; \*IN, 
+         SKIP_SUBJECTS=&gt; \%prev_queries,
+         MIN_BPALIGN =&gt; 50, SKIP_OVERLAP=&gt; $true, 
+         SKIP_SELF =&gt; $false, SKIP_IDENT_HSP=&gt; $true) };
+    next if $q{'error'} eq 'No Blast Title Found';
+    print Dumper \%q;   #use datadumper for good view of data                                           
+    $prev_queries{$q{'qname'}}=1;
+ }
+</PRE>
+<P>
+<HR>
+<H2><A NAME="DESCRIPTION">DESCRIPTION</A></H2>
+<P>
+<CODE>&amp;parse_query</CODE> is a subroutine that parses pairwise
+blastoutput. It has many options, but most importantly all data of interest
+can be parsed (including alignments). The subroutine parses one query at a
+time, and will return all subjects and their high scoring pairs (hsp). This
+program has beenn used extensively for nucleotide comparisons, and has yet
+to be used for protein. Additionally, it has only been used on NCBI
+standalone blastall pairwise output. The parsing model was based
+extensively on Ian Korf's BPlite, which handles protein and WU-BLAST, so
+<CODE>&amp;parse_query</CODE> should be able to parse protein and WU-BLAST.
+BPlite is object oriented which I find slightly cumbersome for quick
+manipulations, but may be more useful to you than a hash structure you
+don't understand.
+
+<P>
+<HR>
+<H2><A NAME="HASH_STRUCTURE_AND_CONTENT">HASH STRUCTURE AND CONTENT</A></H2>
+<P>
+For each call to the subroutine, a query parsed and the parsed output is
+returned in the form of a pointer to a hash. The structure of this hash is
+outlined below All values are standarded except for a few calculated (or
+value added blast) parameters denoted by ***
+
+<P>
+<PRE> 
+ {'&lt;program&gt;'}      blast program and version, e.g. BLASTN 2.0.7
+ {'db'}{'name'}   name of database
+ {'db'}{'seq#'}   number of sequences in database
+ {'db'}{'len'}    length in bases of the database
+</PRE>
+<P>
+<PRE> {'qname'}     really just the first non-space characters in title ***
+                  NAME_TYPE =&gt; 'VERSION' then |VERSION| is sought
+ {'qlen'}      length of query
+ {'qdefn'}     definition line without name if name at beginning
+ 
+ {'sbjct'}[0]  an array containing all the subject hashes
+    {'name'}      name of subject (VERSION option applies) ***
+    {'defn'}      defnition line without name if name at beginning
+    {'len'}       length of subject sequence
+    {'hsps'}      an array containing all of the hsp hashes
+       {'bits'}       bit score for largest hsp
+       {'score'}      ??? score for largest hsp
+       {'expect'}     expected value based on length of query and database
+       {'bpident'}    number of bases/residues identical
+       {'%ident'}     % of bases/residues (bpident/sizealign)
+       {'bppos'}      number of similar residues 
+       {'%pos'}       % of similar residues (bppos/sizealign)
+       {'bpgap'}      number of gapped bases
+       {'%gap'}       % of gaps (bpgap/sizealign)
+       {'sizealign'}  alignment size (bases + gaps)
+       {'qb'}         beginning alignment position of query
+       {'qe'}         ending alignment position of query
+       {'sb'}         beginning alignment position of subject 
+       {'se'}         ending alignment position of subject
+       {'bpalign'}    number of bases juxtaposed (sizealign - gaps) ***
+       {'alignq'}     query string of alignment (only if ALIGN =&gt; 1)
+       {'alignm'}     middle matching |||||| |||| (only if ALIGN =&gt; 1)
+       {'aligns'}     subject string of alignment (only if ALIGN =&gt; 1)
+</PRE>
+<P>
+NOTE:A blast subject can be made of multiple hsps; however, gap blast only
+provides statistics on the highest highest scoring pair.
+
+<P>
+<HR>
+<H2><A NAME="PARSE_OPTIONS">PARSE OPTIONS</A></H2>
+<P>
+NAME_TYPE =&gt;('')/'VERSION' 'VERSION' will parse version for name
+
+<P>
+ALIGN =&gt; (0)/1 set to 1 will return alignment strings for hsps
+
+<P>
+<HR>
+<H2><A NAME="FILTER_OPTIONS">FILTER OPTIONS</A></H2>
+<P>
+There are going to be a lot of names that should have been deprecated
+before I started programming the filters but I haven't invested the effort
+to add more meaningful names yet. Below are both current and planned (***)
+FILTERS=&gt;(with default values).
+
+<P>
+<HR>
+<H3><A NAME="FILTERS_for_single_hsp_independ">FILTERS for single hsp (independent of other hsps)</A></H3>
+<P>
+<PRE> MIN_SIZEALIGN (0)      
+ MIN_BPIDENT   (0)     MIN_%IDENT      (0)***    MAX_%IDENT      (101)*** 
+ MIN_BPPOS     (0)***  MIN_%POS        (0)***    MAX_%POS        (101) ***
+ MIN_BPGAP     (0)***  MIN_%GAP        (0)***    MAX_%GAP        (101)***
+ MIN_BPALIGN   (0)     MIN_FRACBPMATCH (0)***    MAX_FRACBPMATCH (1.01)***
+</PRE>
+<P>
+<HR>
+<H3><A NAME="FILTERS_based_on_other_hsps">FILTERS based on other hsps</A></H3>
+<P>
+SKIP_OVERLAP (0)/1 if 1 all <STRONG>double</STRONG> overlaps will be removed. Double overlaps are overlaps where both the 2
+hsps' queries overlap and the subjects overlap. All hsps are compared to
+higher scoring ones. If a lower scoring one overlaps it is deleted, and
+thus only the higher scoring ones are keptedthe 2 hsps' queri
+
+<P>
+SKIP_ALLOVERLAP_ORIENT =&gt; (0)/1 if set to 1 all overlapping and
+misoriented (relative to highest hsp) are removed. Should be left with
+non-touching hsps with the same subject orientation. 
+
+<P>
+<HR>
+<H3><A NAME="FILTERS_for_various_higher_level">FILTERS for various higher level query or subject interactions</A></H3>
+<P>
+SKIP_SELF (0)/1 if set to 1 then all hits that have the same name for query
+and subject will be deleted. Usually a record that hits itself is
+uninteresting.
+
+<P>
+SKIP_IDENT_HSP (0)/1 if set to 1 then all hits that have the same name for
+query and subject and the same begins and ends for the alignment are
+deleted. This removes a sequence hitting itself, but allows for the
+seuquence to hit itself in a different location
+
+<P>
+SKIP_SUBJECTS =&gt; \%HASH A hash that contains subjects to skip. For
+instance, hash contents of (AC00003=&gt;1,AC00004=&gt;1) would skip these
+to accession numbers if they appeared as a subject of a blast hit. The
+value must be set to 1. This filter is useful for removing duplicate
+pairwise comparisons (A hits B and B hits A) when blasting a database
+against itself.
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Jeff Bailey <A HREF="mailto:(jab@cwru.edu,">(jab@cwru.edu,</A> http:)
+
+<P>
+<HR>
+<H1><A NAME="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</A></H1>
+<P>
+This software was developed at the Department of Genetics, Case Western
+Reserve University and School of Medicine Cleveland OH 44106
+
+<P>
+<HR>
+<H1><A NAME="COPYRIGHT">COPYRIGHT</A></H1>
+<P>
+Copyright (C) 2000 Jeff Bailey. All Rights Reserved.
+
+<P>
+<HR>
+<H1><A NAME="DISCLAIMER">DISCLAIMER</A></H1>
+<P>
+This software is provided ``as is'' without warranty of any kind.
+
+</BODY>
+
+</HTML>
