@@ -6,8 +6,7 @@ use strict 'vars';
 
 use Getopt::Long;
 use Data::Dumper;
-use lib '/home/xws/bin/JABPerlMod';
-use lib '/JABPerlMod';
+use lib './JABPerlMod';
 use Blast qw(&parse_query);
 
 use vars qw($true $false);
