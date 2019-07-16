@@ -124,12 +124,12 @@ data/both.alignscorerdata : data/align_both
 	align_scorer_batch2.pl -a $< -d data/align_both_data -p both -o $@
 
 data/align_both : fasta data/both.parse.defugu.trim.fixed.trim.defrac
-	/net/eichler/vol18/araja/wgac/wgacAlign.sh fasta >sge_align_batch.sh
+	./wgac/wgacAlign.sh fasta >sge_align_batch.sh
 	chmod +x sge_align_batch.sh
 	qsub -N global_align_$(TRIM_SPECIES) -pe orte 25 -q eichler-short.q -l h_rt=24:00:00 -sync y /net/eichler/vol4/home/jlhudd/src/general_pipe/sge_commands.sh sge_align_batch.sh
 	rm -rf both_tmp/both*
 	rm -rf both_tmp
-	/net/eichler/vol18/araja/wgac/wgacAlign.sh fasta 110000 >sge_align_batch_110k.sh
+	./wgacAlign.sh fasta 110000 >sge_align_batch_110k.sh
 	chmod +x sge_align_batch_110k.sh
 	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -q eichler-short.q -l h_rt=16:00:00 -sync y /net/eichler/vol4/home/jlhudd/src/general_pipe/sge_commands.sh sge_align_batch_110k.sh
 	rm -rf both_tmp
