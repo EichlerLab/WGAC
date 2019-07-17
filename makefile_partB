@@ -21,9 +21,7 @@ TRIM_SPECIES=primates
 
 .PHONY : all_stats plots
 
-#all : fastalength.log fasta mask_out fugu blastdb/bofugu.nsq blastout data/bo_self.parse fugu2 selfblast data/lav_int2.parse data/both.parse data/both.parse.defugu data/step_8_mpi/defugu data/step_8_mpi/trim data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
-
-all : fastalength.log fasta mask_out fugu blastdb/bofugu.nsq blastout data/bo_self.parse fugu2 selfblast data/lav_int2.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
+all : fastalength.log fasta mask_out fugu blastdb/bofugu.nsq blastout data/bo_self.parse fugu2 lastz_self_done data/lav_int2.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
 
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
@@ -163,7 +161,7 @@ data/both.parse : data/bo_self.parse data/lav_int2.parse
 	cp $< $@
 	sed 1d $(lastword $^) >> $@
 
-data/lav_int2.parse : selfblast_done
+data/lav_int2.parse : lastz_self_done
 	mkdir -p tmp
 	# changes for lastz instead of the Sun program webb_self (DG, July 15, 2019)
 	blast_lav_break_self_overlap2_for_lastz.pl --in $^ --out tmp
