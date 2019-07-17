@@ -1,0 +1,31 @@
+# construct targets
+
+
+
+
+import glob
+import re
+
+
+aFiles = glob.glob("fugu2/*.fugu" )
+
+aBaseOfTargets = []
+for szFile in aFiles:
+    szBase = os.path.basename( szFile )
+    szBase = re.sub( r".fugu", "", szBase )
+    aBaseOfTargets.append( szBase )
+
+
+rule all:
+    input: expand( "selfblast/{szBase}.fugu.intf", szBase = aBaseOfTargets )
+
+
+rule run_lastz_once:
+    input: "fugu2/{szFugu}"
+    output: "selfblast/{szFugu}.intf"
+    params:  sge_opts="-l mfree=5G"
+    run:
+        szCommand = "module load lastz/1.02.00 && lastz " + str( input ) + " --format=lav --self B=2 O=180 E=1 W=14 Y=1400 --match=10,75   >" + str( output )
+        print( "about to execute: " + szCommand )
+        shell( szCommand )
+
