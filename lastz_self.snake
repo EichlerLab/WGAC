@@ -18,7 +18,7 @@ for szFile in aFiles:
 
 rule all:
     input: expand( "selfblast/{szBase}.fugu.intf", szBase = aBaseOfTargets )
-
+    output: touch( "lastz_self_done" )
 
 rule run_lastz_once:
     input: "fugu2/{szFugu}"
