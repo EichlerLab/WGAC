@@ -3,8 +3,19 @@
 
 
 
+
+
 import glob
 import re
+import os
+
+
+if ( os.exists( "lastz_self.json" ) ):
+   configfile: "lastz_self.json"
+   szParameters = config[ "parameters" ]
+else:
+   szParameters = " --format=lav --self B=2 O=180 E=1 W=14 Y=1400 --match=10,75 "
+
 
 
 aFiles = glob.glob("fugu2/*.fugu" )
@@ -25,7 +36,7 @@ rule run_lastz_once:
     output: "selfblast/{szFugu}.intf"
     params:  sge_opts="-l mfree=5G"
     run:
-        szCommand = "module load lastz/1.02.00 && lastz " + str( input ) + " --format=lav --self B=2 O=180 E=1 W=14 Y=1400 --match=10,75   >" + str( output )
+        szCommand = "module load lastz/1.02.00 && lastz " + str( input ) + " " + szParameters + " >" + str( output )
         print( "about to execute: " + szCommand )
         shell( szCommand )
 
