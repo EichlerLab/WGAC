@@ -10,7 +10,7 @@ import re
 import os
 
 
-if ( os.exists( "lastz_self.json" ) ):
+if ( os.path.exists( "lastz_self.json" ) ):
    configfile: "lastz_self.json"
    szParameters = config[ "parameters" ]
 else:
