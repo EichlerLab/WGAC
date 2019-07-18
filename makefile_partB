@@ -164,7 +164,7 @@ data/both.parse : data/bo_self.parse data/lav_int2.parse
 data/lav_int2.parse : lastz_self_done
 	mkdir -p tmp
 	# changes for lastz instead of the Sun program webb_self (DG, July 15, 2019)
-	blast_lav_break_self_overlap2_for_lastz.pl --in $^ --out tmp
+	blast_lav_break_self_overlap2_for_lastz.pl --in selfblast --out tmp
 	blast_lav_hit_by_hit_for_lastz.pl --in tmp --out $@ \
 		-options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
 	rm -rf tmp
