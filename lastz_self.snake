@@ -39,5 +39,5 @@ rule run_lastz_once:
         szCommand = "module load lastz/1.02.00 && lastz " + str( input ) + " " + szParameters + " >" + str( output )
         print( "about to execute: " + szCommand )
         shell( szCommand )
-		# had latency problems so adding this so file above will appear to snakemake
-		shell( "sleep 20" )
+        # had latency problems so adding this so file above will appear to snakemake
+        shell( "sleep 20" )
