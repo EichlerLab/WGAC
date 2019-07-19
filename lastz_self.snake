@@ -99,7 +99,6 @@ rule make_batch_tab:
               szFuguFile = aFuguFiles[nFile]
 
               nBatchNumber = int( nFile / nNumberOfFuguFilesPerBatch )
-              print( "nBatchNumber = " + str( nBatchNumber ) )
 
               fBatches.write( szFuguFile.decode("utf-8")   )
               fBatches.write( "\t" )
