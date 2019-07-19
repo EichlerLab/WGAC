@@ -107,7 +107,7 @@ stats/oneHitPerLine : data/oo.weild10kb.join.all.cull
 	perl ./getLenStat4Cull.pl $< > stats/all.join.cull.lenDis
 	perl ./getLenStat4Cull-2K.pl $< >stats/all.join.cull.lenDis_2K
 	perl ./getSimStat4Cull-05.pl $< >stats/all.join.cull.simDis_05
-	perl /net/eichler/vol4/home/jlhudd/wgac/oneHitPerLine.pl $< >$@
+	perl ./oneHitPerLine.pl $< >$@
 
 data/GenomicSuperDup.tab : data/oo.weild10kb.join.all.cull
 	perl ./makeTrack.pl $< > $@
