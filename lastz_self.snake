@@ -8,6 +8,14 @@
 import glob
 import re
 import os
+import subprocess
+import numpy as np
+import pandas as pd
+import subprocess
+
+
+# force always remaking the batches file
+shell( "rm -f batches_for_lastz_self.tab" )
 
 
 if ( os.path.exists( "lastz_self.json" ) ):
@@ -18,26 +26,85 @@ else:
 
 
 
-aFiles = glob.glob("fugu2/*.fugu" )
+szCommand = "ls fugu2 | wc -l "
+print( "about to execute: " + szCommand )
+szOutput = subprocess.check_output( szCommand, shell = True )
+nNumberOfFuguFiles = int( szOutput.rstrip() )
+nNumberOfFuguFilesPerBatch = 300
+nNumberOfBatches = int( (nNumberOfFuguFiles + nNumberOfFuguFilesPerBatch - 1) / nNumberOfFuguFilesPerBatch )
 
-aBaseOfTargets = []
-for szFile in aFiles:
-    szBase = os.path.basename( szFile )
-    szBase = re.sub( r".fugu", "", szBase )
-    aBaseOfTargets.append( szBase )
+localrules: run_lastz_all, make_batch_tab
 
-
-rule all:
-    input: expand( "selfblast/{szBase}.fugu.intf", szBase = aBaseOfTargets )
+rule run_lastz_all:
+    input:
+        flag=expand('flags/batch_{batch}_done', batch=range( 0, nNumberOfBatches) )
     output: touch( "lastz_self_done" )
-
-rule run_lastz_once:
-    input: "fugu2/{szFugu}"
-    output: "selfblast/{szFugu}.intf"
-    params:  sge_opts="-l mfree=5G"
     run:
-        szCommand = "module load lastz/1.02.00 && lastz " + str( input ) + " " + szParameters + " >" + str( output )
+        szOutput = subprocess.check_output( "ls fugu2/* | wc -l", shell = True )
+        nNumberOfFugu2Files = int( szOutput.rstrip() )
+        szOutput = subprocess.check_output( "ls selfblast/* | wc -l", shell = True )
+        nNumberOfSelfblastFiles = int( szOutput.rstrip() )
+        print( "nNumberOfFugu2Files = {:d} nNumberOfSelfblastFiles = {:d}".format( nNumberOfFugu2Files, nNumberOfSelfblastFiles ) )
+
+        assert nNumberOfFugu2Files == nNumberOfSelfblastFiles
+
+
+rule run_lastz_on_one_batch_of_fugu_files:
+    input:
+        tab='batches_for_lastz_self.tab'
+    output:
+        flag=touch('flags/batch_{batch}_done')
+    params: sge_opts = "-l mfree=5G"
+    run:
+        
+        df = pd.read_csv(input.tab, sep='\t')
+        
+        df = df.loc[df['BATCH'] == int(wildcards.batch)]
+
+        szCommand = "mkdir -p selfblast"
         print( "about to execute: " + szCommand )
-        shell( szCommand )
-        # had latency problems so adding this so file above will appear to snakemake
-        shell( "sleep 20" )
+        subprocess.check_call( szCommand, shell = True )
+        
+        
+        for szFuguFile in df['FUGU_FILE']:
+
+
+           szOutput = "selfblast/" + szFuguFile + ".intr"
+           szInput = "fugu2/" + szFuguFile
+
+           szCommand = "module load lastz/1.02.00 && lastz " + szInput + " " + szParameters + " >" + szOutput
+           print( "about to execute: " + szCommand )
+           shell( szCommand )
+
+rule make_batch_tab:
+    input: "fugu2" 
+    output:
+        tab='batches_for_lastz_self.tab'
+    params: sge_opts="-l mfree=5G"
+    run:
+        szCommand = "ls fugu2 | shuf "
+        print( "about to execute: " + szCommand )
+        szOutput = subprocess.check_output( szCommand, shell = True )
+              
+        aFuguFiles = szOutput.splitlines()
+
+        print( "aFuguFiles has length " + str( len( aFuguFiles ) ) )
+
+        with open( output.tab, "w" ) as fBatches:
+
+           fBatches.write( "FUGU_FILE\tBATCH\n" )
+
+
+           for nFile in range( 0, len( aFuguFiles ) ):
+              szFuguFile = aFuguFiles[nFile]
+
+              nBatchNumber = int( nFile / nNumberOfFuguFilesPerBatch )
+              print( "nBatchNumber = " + str( nBatchNumber ) )
+
+              fBatches.write( szFuguFile.decode("utf-8")   )
+              fBatches.write( "\t" )
+              fBatches.write( str( nBatchNumber ) )
+              fBatches.write( "\n" )
+
+              #fBatches.write( "{:s}\t{:d}\n".format( szFuguFile, nBatchNumber ) )
+             
