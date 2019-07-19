@@ -15,7 +15,8 @@ import subprocess
 
 
 # force always remaking the batches file
-shell( "rm -f batches_for_lastz_self.tab" )
+# didn't work--kept deleting it.
+#shell( "rm -f batches_for_lastz_self.tab" )
 
 
 if ( os.path.exists( "lastz_self.json" ) ):
