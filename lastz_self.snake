@@ -70,7 +70,7 @@ rule run_lastz_on_one_batch_of_fugu_files:
         for szFuguFile in df['FUGU_FILE']:
 
 
-           szOutput = "selfblast/" + szFuguFile + ".intr"
+           szOutput = "selfblast/" + szFuguFile + ".intf"
            szInput = "fugu2/" + szFuguFile
 
            szCommand = "module load lastz/1.02.00 && lastz " + szInput + " " + szParameters + " >" + szOutput
