@@ -133,7 +133,9 @@ sub lav_remove_self_overlap{ # FILEHANDLE
 						if ($starting==$true) {
 							$begin2 = $sb;
 							$starting=$false;
-							print scalar(@l), "PIECE IS \n";
+                            # removed July 2019 (DG) because it creates a huge
+                            # amount of output probably slowing down the program
+							#print scalar(@l), "PIECE IS \n";
 						}
 						#check if HSP overlapping#
 						last if ($qe >= $sb);
