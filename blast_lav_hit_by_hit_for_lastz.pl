@@ -233,8 +233,9 @@ sub parse_lav{ # FILEHANDLE
 		my @hsp;
 		$line=<$FH> until $line =~/^[sa]/ || eof $FH;
 		
+S_or_A_STANZA:
 		while ($line=~ /^[sa]/) {
-			#print "found\n";
+
 		   if ($line=~/^a/) {
 		    	my %h=();
 		    	$line=<$FH>;
@@ -248,6 +249,8 @@ sub parse_lav{ # FILEHANDLE
 		    	$line=<$FH>;
 		    	my ($bpident,$bpgap,$bpalign)=(0,0,0);
 		    	my ($lqe,$lse)=(0,0);
+
+L_STANZA:
 		    	while ( $line=~/l (\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/ ) {
 		    		my ($qb,$sb,$qe,$se,$perc)=($1,$2,$3,$4,$5);
 		    		my $leng= $qe-$qb+1;
@@ -255,11 +258,25 @@ sub parse_lav{ # FILEHANDLE
 		    		#print "$line\n";
 		    		if ($perc==0 || $leng<1) {
 		  				$d{'error'}.= $line;
-		  				print "BAD ALIGNMENT$line ($leng)\n";
-		  				$line=<$FH>;
-		  				
-		  				next;
-		  			}
+		  				print "BAD ALIGNMENT $line ($leng) at line $.\n";
+
+                        # changed DG July 2019 to handle s 0 blocks
+                        while( 1 ) {
+                            $line=<$FH>;
+                            if ( eof( $FH ) ) {
+                                print "ignoring this last bad alignment\n";
+                                return;####
+                            }
+                            elsif ( $line=~/l (\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/ ) {
+                                next L_STANZA;
+                            }
+                            elsif ( $line =~ /^[sa]/) {
+                                next S_or_A_STANZA;
+                            }
+                        }
+
+                        # end of DG change
+ 		  			}
 		    		my $ident=int ($leng*($perc+0.499999)/100 ); #reverse engineering#
 		    		my $fix=int($ident/$leng *100+ 0.5);  #forward check#
 		    		#son of a bitch#
