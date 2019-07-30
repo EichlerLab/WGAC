@@ -31,7 +31,7 @@ szCommand = "ls fugu2 | wc -l "
 print( "about to execute: " + szCommand )
 szOutput = subprocess.check_output( szCommand, shell = True )
 nNumberOfFuguFiles = int( szOutput.rstrip() )
-nNumberOfFuguFilesPerBatch = 300
+nNumberOfFuguFilesPerBatch = 100
 nNumberOfBatches = int( (nNumberOfFuguFiles + nNumberOfFuguFilesPerBatch - 1) / nNumberOfFuguFilesPerBatch )
 
 localrules: run_lastz_all, make_batch_tab
