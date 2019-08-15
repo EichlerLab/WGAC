@@ -8,7 +8,7 @@ use Getopt::Long;
 use Data::Dumper;
 use FindBin;
 # changed DG
-use lib "/net/eichler/vol2/local/inhousebin/JABPerlMod";
+use lib "./JABPerlMod";
 #use lib "$FindBin::Bin/JABPerlMod"; # subdirectory JABPerlMod should contain Blast.pm
 # end changed DG
 use Blast qw(&parse_query);
