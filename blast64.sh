@@ -75,7 +75,7 @@ echo Copying files to nodes
 mpirun -x PATH -x LD_LIBRARY_PATH \
   --prefix $MPIBASE -mca plm ^rshd \
   -mca btl ^openib \
-  python /net/eichler/vol4/home/jlhudd/src/rsync_mpi/batch_node_copy.py \
+  python /net/eichler/vol26/home/nobackup/archive/jlhudd/src/rsync_mpi/batch_node_copy.py \
   --source "$DATABASE_PATH.[^q]*" --dest "$BLAST_TMP_DIR" \
   --pre_sync_commands "mkdir -p $BLAST_TMP_DIR"
 
@@ -84,8 +84,8 @@ echo Running BLAST
 mpirun -x PATH -x LD_LIBRARY_PATH \
   --prefix $MPIBASE -mca plm ^rshd \
   -mca btl ^openib \
-  /net/eichler/vol4/home/jlhudd/bin/general_pipe \
-  "/net/eichler/vol2/local/bin/blastall -p blastn -i dummy_in -o dummy_out -d $BLAST_TMP_DIR/$DATABASE_NAME -v 5000 -b 5000 -G 180 -E 1 -q -80 -r 30 -e 1e-30 -F F -z 3000000000 -Y 3000000000" \
+  $WORKING_DIR/general_pipe \
+  "$WORKING_DIR/blastall -p blastn -i dummy_in -o dummy_out -d $BLAST_TMP_DIR/$DATABASE_NAME -v 5000 -b 5000 -G 180 -E 1 -q -80 -r 30 -e 1e-30 -F F -z 3000000000 -Y 3000000000" \
   $INPUT $OUTPUT ".bo" $TMP_DIR
 
 echo Done
