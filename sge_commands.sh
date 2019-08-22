@@ -47,10 +47,13 @@ echo "Python path:"
 echo $PYTHONPATH
 echo `hostname`
 
+# changed from (DG, Aug 2019)
+#  /net/eichler/vol4/home/jlhudd/src/general_pipe/general_pipe.py
+
 mpirun -x PATH -x LD_LIBRARY_PATH \
   --prefix $MPIBASE -mca plm ^rshd \
   -mca btl ^openib \
-  /net/eichler/vol4/home/jlhudd/src/general_pipe/general_pipe.py \
+  `pwd`/general_pipe.py \
   --input_file="$INPUT" \
   --commands
 echo `hostname`
