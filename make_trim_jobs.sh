@@ -13,5 +13,6 @@ echo "#!/bin/bash"
 echo "#$ -S /bin/bash"
 echo "#$ -cwd"
 
-for i in `pwd`/data/step_8_mpi/defugu/*;do echo "perl /net/eichler/vol4/home/jlhudd/wgac/Trim.pl $i `pwd`/fasta `pwd`/data/step_8_mpi/trim ${SPECIES}";done
+# changed (DG, 8/16/2019) so Trim.pl is part of wgac distribution instead of in jlhudd's directory
+for i in `pwd`/data/step_8_mpi/defugu/*;do echo "perl `pwd`/Trim.pl $i `pwd`/fasta `pwd`/data/step_8_mpi/trim ${SPECIES}";done
 
