@@ -12,6 +12,6 @@ in_name=`echo "$INPUT"|cut -d "/" -f2`
 
 cd data
 
-perl /net/eichler/vol2/local/inhousebin/blast_hit_by_hit_welder2.pl -i $in_name -g 40:10000:20 -o oo.weild10kb 
+perl ../blast_hit_by_hit_welder2.pl -i $in_name -g 40:10000:20 -o oo.weild10kb 
 
 cd ../
