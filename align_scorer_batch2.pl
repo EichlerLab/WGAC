@@ -25,13 +25,13 @@ if ($ARGV[0] eq "") {
 getopts('a:p:o:d:e:');
 $opt_e ||= $default_executable;
 
-system ("mkdir $opt_d") if $opt_d;
+system ("mkdir -p $opt_d") if $opt_d;
 
 opendir (DIR, $opt_a) || die ('Cant open directory $opt_a!');
 @dir = grep { /[A-Za-z0-9]/ } readdir (DIR);
 close DIR;
 @dir = sort @dir;
-system "mkdir $opt_d";
+system "mkdir -p $opt_d";
 unshift @dir, "";
 print "DIR" ,join (":",@dir), "\n";
 foreach my $d (@dir) {
