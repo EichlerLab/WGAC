@@ -481,7 +481,9 @@ sub blast_trim_ends {
 			&fasta_save("subject$ran",substr($seq2,$sb-1,$se-$sb+1), ">subject$ran");
 		}
   		print "query$ran and subject$ran and alignout$ran\n";
-		system "/net/eichler/vol2/local/bin/align0 -f -30 -g -1 query$ran subject$ran  > alignout$ran";
+        (my $exeAlign0 = $0 ) =~ s/pairwise.pl//;
+        $exeAlign0 = $exeAlign0 . "align0";
+        !system "$exeAlign0 -f -30 -g -1 query$ran subject$ran  > alignout$ran" || die "couldn't execute $exeAlign0";
 		
 
 		system "head -$opt_a alignout$ran	" if $opt_a;
@@ -630,7 +632,10 @@ sub blast_trim_ends {
 		} else {
 			&fasta_save("subject$ran",substr($seq2,$sb-1,$se-$sb+1), ">subject$ran");
 		}
-		system "/net/eichler/vol2/local/bin/align0  -f -30 -g -1 query$ran subject$ran  > alignout$ran 2>/dev/null";
+
+        (my $exeAlign0 = $0 ) =~ s/pairwise.pl//;
+        $exeAlign0 = $exeAlign0 . "align0";
+        !system "$exeAlign0 -f -30 -g -1 query$ran subject$ran  > alignout$ran 2>/dev/null" || die "couldn't execute $exeAlign0";
 		system "tail -$opt_a alignout$ran	" if $opt_a;
 		my ($s1,$s2)=&align_load(-alignment=>"alignout$ran");
 		if ($s1 eq '') {
