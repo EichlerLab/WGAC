@@ -72,10 +72,14 @@ echo LD_LIBRARY_PATH: $LD_LIBRARY_PATH
 
 echo Copying files to nodes
 # Create tmp directory on cluster nodes and copy BlastDB files to nodes.
+# changed from
+# python /net/eichler/vol26/home/nobackup/archive/jlhudd/src/rsync_mpi/batch_node_copy.py \
+# to not have full path (DG, Aug 2019)
+
 mpirun -x PATH -x LD_LIBRARY_PATH \
   --prefix $MPIBASE -mca plm ^rshd \
   -mca btl ^openib \
-  python /net/eichler/vol26/home/nobackup/archive/jlhudd/src/rsync_mpi/batch_node_copy.py \
+  python `pwd`/batch_node_copy.py \
   --source "$DATABASE_PATH.[^q]*" --dest "$BLAST_TMP_DIR" \
   --pre_sync_commands "mkdir -p $BLAST_TMP_DIR"
 
