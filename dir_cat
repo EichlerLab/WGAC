@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+#dir_cat.pl
+#TAKES A DIR OF FILES AND CONCATANATES THEM
+$dir=$ARGV[0];
+$output=$ARGV[1];
+$search=$ARGV[2];
+
+$program = "$0";
+$program =~ s/^.*\///;
+### program stats ###
+$pusage= "$program [input dir] [outputfile|STDOUT] [optional:regular expression pattern to match in file names]";
+$pversion='2.021121';
+$pdescription = "$program (ver:$pversion) concatenates a directory of files for when a simple cat * bites the dust because there are too many files";
+$pgenerate= 'total: labmates: genetics:';
+### program stats end ###
+
+
+if (!defined $ARGV[0]) {
+print "USAGE
+$pusage
+DESCRIPTION
+$pdescription
+EXAMPLES
+dir_cat pericentromereBES julie_ends 'CAGGG|Peri';
+  This searches the directory pericentromereBES for files
+  with CAGGG or Peri in the name and concatanates them to the
+  file julie_ends
+dir_cat fasta STDOUT | formatdb -i stdin -n my_db
+  This concatanates all the files in directory fasta and sends
+  them to the standard output which is captured in this case by
+  formatdb to create a database called my_db
+dir_cat fasta STDOUT 'CAGGG|Peri' | grep '>' | more
+  This is a nice way to check to make sure you pattern match is 
+  finding the proper files.  Then you can remove the more and grep 
+  and replace STDOUT with a filename
+";
+exit;
+}
+if ($ARGV[0] eq '-h' || $ARGV[0] eq '-help') {
+	system "perldoc $0\n";
+	exit;
+}
+
+#STANDARD VALUES
+$true=1;
+$false=0;
+
+$search || ( $search='[A-Z0-9a-z]');
+####OPEN INFILE AND OUTFILE AND LOGFILE
+opendir (DIR,"$dir") || die ('Cant read directory ($dir)!');
+@filelist = grep {/$search/i } readdir (DIR);
+@filelist = sort (@filelist);
+close (LIST);
+if (uc ($output) eq 'STDOUT') {
+	$out='STDOUT';
+} else {
+	open ($out,">$output") || die('Cant write output file ($output)!');
+}
+chomp @filelist;
+foreach $file (@filelist) {
+	print "$file","\t" if $out ne 'STDOUT';
+	open (SEQ, "$dir/$file") || die("Can't read file ($file)!\n");
+	while (<SEQ>) {
+		chomp;
+		print $out "$_\n";
+	}
+	close SEQ;
+}
+close OUT;
+
+
