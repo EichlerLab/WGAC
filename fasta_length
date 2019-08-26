@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+use strict 'vars';
+use Getopt::Std;
+
+#020808 added the ability to separate out batch files#
+#010116 add force file creation option#
+#000925 fixed the program up a bit 
+#000808 added directory greping ability for large number of files#
+
+
+use vars qw(@files $path);
+use vars qw($opt_o $opt_d $opt_s $opt_f);
+
+
+
+
+
+use vars qw($program $pusage $pversion $pdescription $pgenerate);
+$program = "$0";
+$program =~ s/^.*\///;
+### program stats ###
+$pversion="3.010116";
+$pdescription ="$program ($pversion) calculates the base composition and \% G+C of fasta formatted sequences.";
+$pgenerate= 'total: labmates: genetics: public:';
+$pusage="$program <fasta file(s)> ";
+
+## program stats end ###
+
+
+if (! defined $ARGV[0]) {
+print "usage: $0 -o outfile -d [dirpath] -s/-f [fasta file(s)]
+DESCRIPTION\n$pdescription
+ARGUMENTS
+  -d [directory path] for when there are too may files for a wildcard(*)
+  -f [switch] calculate just for files not fasta records within files
+  -o [file path] creates an output file of base composition
+  	  -s [switch]  creates an output with filename and total length columns 1 & 2
+";
+exit;
+}
+if ($ARGV[0] eq '-h' || $ARGV[0] eq '-help') {
+	system "perldoc $0\n";
+	exit;
+}
+
+
+getopts('o:d:sf');
+
+
+
+if ($opt_o) {
+	open (OUT,">$opt_o") || die "Can't open for write ($opt_o)!\n";
+	if ($opt_s) {
+		if ($opt_f) {
+			print OUT "FILE\tTOTAL\t";
+		} else {
+			print OUT "SEQ\tTOTAL\tFILE\t";
+		}
+	} else {
+		print OUT "SEQ#\tFILE\tSEQ\tTOTAL\t";
+	}
+	print OUT "ACTGO\tGC\%\tA\tC\tT\tG\tO\tN\tX\tU\n";
+
+}
+	
+
+if ($opt_o) {
+	if ($opt_s) {
+	} else {
+
+	}
+
+}
+
+if ($opt_d) {
+	opendir (DIR, "$opt_d") || die "Can't open directory($opt_d)!\n";
+	@files=grep { /\w/ } readdir DIR;
+	closedir DIR;
+	$opt_d .='/';
+} else {
+	@files = @ARGV;
+}
+
+my $count=0;
+my %unknown=();
+my ($sumtotbases,$suma,$sumc,$sumg,$sumt, $sumo, $sumu, $sumd,$sumn,$sumx) = (0,0,0,0,0,0,0,0,0,0);
+for my $file (sort @files) {
+	my ($a,$g,$c,$t,$o,$n, $x ,$u,$d, $totbases)=(0,0,0,0,0,0,0,0,0);
+	open (FASTA, "$opt_d$file") || die "File ($file) could not be opened!\n";
+	my $header='';
+	$header=<FASTA> until $header=~/\S/ || eof FASTA; #allow for blank lines
+	die ("File does not contain a fasta header ($opt_d/$file)!\n") if $header !~/^>/;
+	my $line='';
+	while (<FASTA>) {
+		s/\r\n/\n/;
+		chomp;
+		s/\s+/ /mg;
+		if ( !/^>/  ) {
+			###calculate bases and stuff
+			$_=uc($_);
+			$totbases += length;
+			$a+= tr/A//d;
+			$g+= tr/G//d;
+			$c+= tr/C//d;
+			$t+= tr/T//d;
+			$n+= tr/N//d;
+			$x+= tr/X//d;
+			$d+= tr/-//d;
+			$o+= tr/MRWSYKVHDB//d;
+			$u+= length;  #all remaining characters
+			foreach my $c (split // ) {
+				$unknown{$c}++;
+			}
+			#add printing out unknown characters#
+			
+		}
+		next if $opt_f && /^>/;  #skip separate calculations
+		if ( /^>/ || eof FASTA ) {
+			####final calculations and output####
+			my $name='';
+			$name=$1 if $header =~ /^>(\S+)/;
+			$name='' if $opt_f;
+			my $frac_gc='';
+			my $atcg=$a+$c+$g+$t;
+			my $atcgo=$atcg+$o;
+			$frac_gc=($c+$g)/($atcg)*10000 if ($atcg)>0;
+			$frac_gc=int($frac_gc)/100;
+			my $notND=$totbases-$n-$d;
+			$sumtotbases+=$totbases;
+			$suma+=$a;
+			$sumc+=$c;
+			$sumg+=$g;
+			$sumt+=$t;
+			$sumo+=$o;
+			$sumn+=$n;
+			$sumx+=$x;
+			$sumd+=$d;
+			$sumu+=$u;
+			print ++$count,") $file:$name TOTAL($totbases) ATCGO:$atcgo \%GC $frac_gc A:$a C:$c G:$g T:$t O:$o  N:$n X;$x -:$d U:$u  \n";
+			if ($opt_o) {
+				if ($opt_s) {
+					#print simple format of name\tlength
+					$file =~ s/^.*\///;
+					if ($opt_f) {
+						print OUT "$file\t$totbases\t";
+					} else {
+						print OUT "$name\t$totbases\t$file\t";
+					}
+				} else {
+					print OUT "$count\t$file\t$name\t$totbases\t";
+				}
+				print OUT "$atcgo\t$frac_gc\t$a\t$c\t$t\t$g\t$o\t$n\t$x\t$u\n";
+
+			}
+			###que up next header if necessary
+			if ( /^>/) {
+				($a,$g,$c,$t,$o,$n, $x ,$u,$d, $totbases)=(0,0,0,0,0,0,0,0,0);
+				$header=$_;
+			}
+			
+			
+		}
+		
+	}
+	close FASTA;
+}
+############################
+#####print the totals ######;
+my $sumatcg=$suma+$sumc+$sumg+$sumt;
+my $sumatcgo=$sumatcg+$sumo;
+my $frac_gc  ='';
+$frac_gc= ($sumc+$sumg)/($sumatcg)*10000 if $sumatcg>0;
+$frac_gc=int($frac_gc)/100;
+print "GRAND TOTAL:($sumtotbases) ATCGO[$sumatcgo] \%GC $frac_gc A:$suma C:$sumc G:$sumg T:$sumt O:$sumo  N:$sumn X:$sumx -:$sumd U:$sumu\n";
+if ($opt_o) {
+	if ($opt_s) {
+		#don't print totals
+	} else {
+		print OUT "TOTAL\tTOTAL\tTOTAL\t$sumtotbases\t$sumatcgo\t$frac_gc\t$suma\t$sumc\t$sumt\t$sumg\t$sumo\t$sumn\t$sumx\t$sumu\n";
+	}
+}
+	
+
+if (keys %unknown) {
+	print "!!!!WARNING: UNKNOWN CHARACTERS (";
+	foreach my $k (keys %unknown) {
+		print $k; 
+		print "[",ord($k),"] ";
+	}
+	print ") IN THESE FASTA FILES!!!\n";
+
+}
+
+close OUT;
