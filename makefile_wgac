@@ -51,7 +51,7 @@ all : fastalength.log fasta mask_out_done fugu blastdb/bofugu.nsq blastout data/
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
 plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
-	pushd stats; Rscript /net/eichler/vol4/home/jlhudd/pipelines/wgac/plot.R; popd;
+	pushd stats; Rscript ../plot.R; popd;
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
