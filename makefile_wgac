@@ -102,7 +102,7 @@ stats/interDupLen : stats/interMerge
 	perl ./statLenPerChr.pl $< > $@
 
 stats/intraMerge : stats/intraSort
-	perl /net/eichler/vol4/home/jlhudd/wgac/mergeHit.pl $< > $@
+	perl ./mergeHit.pl $< > $@
 
 stats/interMerge : stats/interSort
 	perl ./mergeHit.pl $< > $@
