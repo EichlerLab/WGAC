@@ -1,62 +1,78 @@
+# Load libraries.
+library(ggplot2)
+library(grid)
+options( echo = TRUE )
+
 # Constants
-bar_colors <- c("#333333", "#E6E6E6")
+bar_colors <- c("#F8766D", "#00BFC4")
+axis_labels <- element_text(family="Times New Roman", size=14)
+x_axis_ticks <- element_text(family="Times New Roman", size=14, angle=-90, hjust=0)
 
 # Length distribution
-png("lendis.png", family="Times", pointsize=14)
+png("lendis.png", width=700)
 lendis <- read.table("all.join.cull.lenDis", skip=2, header=TRUE)
-lendis.m <- as.matrix(lendis[5:6])
-rownames(lendis.m) <- lendis[,1]
-par(mar=c(5, 7, 4, 2) + 0.1)
-barplot(t(lendis.m), beside=TRUE, col=bar_colors, space=c(0, 0.5), axes=FALSE, xlab="Length", las=2)
-axis(2, yaxp=c(0, 22500000, 10), las=2)
-title(ylab="Bases (bp)", line=5.5)
-legend("topright", c("inter", "intra"), fill=bar_colors)
+sizes <- factor(as.character(lendis$size), levels=unique(lendis$size), ordered=TRUE)
+lengths <- rbind(
+    data.frame(size=sizes, length=lendis$interlen, type="inter"),
+    data.frame(size=sizes, length=lendis$intralen, type="intra")
+)
+# Convert bases to Megabases by dividing lengths by 1,000,000.
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) +
+geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
 dev.off()
 
 # 2 kbp length distribution
-png("lendis_2K.png", family="Times", pointsize=14)
+png("lendis_2K.png", width=700)
 lendis.2K <- read.table("all.join.cull.lenDis_2K", skip=2, header=TRUE)
-lendis.2K.m <- as.matrix(lendis.2K[5:6])
-rownames(lendis.2K.m) <- lendis.2K[,1]
-par(mar=c(7, 7, 4, 2) + 0.1)
-barplot(t(lendis.2K.m), beside=TRUE, col=bar_colors, space=c(0, 0.5), axes=FALSE, las=2)
-axis(2, yaxp=c(0, 22500000, 10), las=2)
-title(xlab="Length (kbp)", line=4)
-title(ylab="Bases (bp)", line=5.5)
-legend("topright", c("inter", "intra"), fill=bar_colors)
+sizes <- factor(as.character(lendis.2K$size), levels=unique(lendis.2K$size), ordered=TRUE)
+lengths <- rbind(
+    data.frame(size=sizes, length=lendis.2K$interlen, type="inter"),
+    data.frame(size=sizes, length=lendis.2K$intralen, type="intra")
+)
+# Convert bases to Megabases by dividing lengths by 1,000,000.
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
 dev.off()
 
 # Aligned bases by % identity
-png("simdis.png", family="Times", pointsize=14)
+png("simdis.png", width=700)
 simdis <- read.table("all.join.cull.simDis", skip=2, header=TRUE)
-simdis.m <- as.matrix(simdis[4:5])
-par(mar=c(7, 7, 4, 2) + 0.1)
-barplot(t(simdis.m), beside=TRUE, col=bar_colors, space=c(0, 0.5), axes=FALSE, las=2)
-axis(2, yaxp=c(0, 5150000, 10), las=2)
-title(ylab="Aligned Bases (bp)", line=5.5)
-title(xlab="Identity (%)", line=4)
-legend("topright", c("inter", "intra"), fill=bar_colors)
+identities <- factor(as.character(rownames(simdis)), levels=unique(rownames(simdis)), ordered=TRUE)
+lengths <- rbind(
+    data.frame(size=identities, length=simdis$TotalinterLength, type="inter"),
+    data.frame(size=identities, length=simdis$intraLength, type="intra")
+)
+# Convert bases to Megabases by dividing lengths by 1,000,000.
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
 dev.off()
 
 # Aligned bases by % identity (smaller interval)
-png("simdis_05.png", family="Times", pointsize=14)
+png("simdis_05.png", width=700)
 simdis <- read.table("all.join.cull.simDis_05", skip=2, header=TRUE)
-simdis.m <- as.matrix(simdis[5:6])
-rownames(simdis.m) <- simdis[,1]
-par(mar=c(7, 7, 4, 2) + 0.1)
-barplot(t(simdis.m), beside=TRUE, col=bar_colors, space=c(0, 0.5), axes=FALSE, las=2)
-axis(2, yaxp=c(0, 3000000, 10), las=2)
-title(ylab="Aligned Bases (bp)", line=5.5)
-title(xlab="Identity (%)", line=4)
-legend("topright", c("inter", "intra"), fill=bar_colors)
+identities <- factor(as.character(simdis$size), levels=unique(simdis$size), ordered=TRUE)
+lengths <- rbind(
+    data.frame(size=identities, length=simdis$interLength, type="inter"),
+    data.frame(size=identities, length=simdis$intraLength, type="intra")
+)
+# Convert bases to Megabases by dividing lengths by 1,000,000.
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
 dev.off()
 
 # Similarity and Kimura's k by length
+png("kimura_by_length.png", width=700)
 sim_kimura <- read.table("length_similarity_kimura", header=TRUE)
-png("similarity_by_length.png", family="Times", pointsize=14)
-plot(sim_kimura$base_S, sim_kimura$per_sim, xlab="Length (bp)", ylab="Similarity (%)")
+ggplot(sim_kimura, aes(y=k_kimura, x=base_S)) + geom_point(shape=21) + ylab("Kimura's k") + xlab("Length (bp)") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels, plot.margin=unit(c(1,1,1,1), "cm"))
 dev.off()
 
-png("kimura_by_length.png", family="Times", pointsize=14)
-plot(sim_kimura$base_S, sim_kimura$k_kimura, xlab="Length (bp)", ylab="Kimura's k")
+# Non-redundant duplication by chromosome/contig.
+bar_colors <- c("#F8766D", "#00BFC4", "beige")
+png("nonredundant_duplication_by_chromosome.png", width=700)
+nr <- read.table("nr_stats.tab", header=TRUE)
+chromosomes <- factor(as.character(nr$contig), levels=unique(nr$contig), ordered=TRUE)
+lengths <- rbind(
+    data.frame(chromosome=chromosomes, length=nr$inter, type="inter"),
+    data.frame(chromosome=chromosomes, length=nr$intra, type="intra"),
+    data.frame(chromosome=chromosomes, length=nr$total, type="both")
+)
+# Convert bases to Megabases by dividing Kbp lengths by 1,000.
+ggplot(lengths, aes(y=length/1000, x=chromosome, fill=type)) + geom_bar(colour="black", position="dodge", stat = "identity") + scale_y_continuous("Bases (Mbp)") + xlab("Chromosome") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) + scale_fill_manual(values=bar_colors)
 dev.off()
