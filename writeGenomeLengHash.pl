@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/perl
 my @a;
 my $hashRef;
@@ -13,7 +11,7 @@ while(<>){
 next if (/TOTAL/);
 	s/\.fa//;
 	@a = split (/\s+/);
-    print "\'$a[2]\' => $a[3],\n";
+    print "\'$a[1]\' => $a[3],\n";
 }
 
 

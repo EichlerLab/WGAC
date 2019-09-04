@@ -11,7 +11,7 @@ while(<>){
 next if (/TOTAL/);
 	s/\.fa//;
 	@a = split (/\s+/);
-	print "$a[2]\t$a[3]\n";
+	print "$a[1]\t$a[3]\n";
 }
 
 
