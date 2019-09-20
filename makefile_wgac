@@ -3,11 +3,11 @@
 # make fastawhole a link to the genome such as:
 # fastawhole -> /net/eichler/vol2/eee_shared/assemblies/hg19/chromosomes
 
-WGAC_GITHUB=.
 FASTAWHOLE_DIR=fastawhole
-REPEATMASKER_SPECIES="Homo sapiens"
-# TRIM_SPECIES must not have any spaces in it
-TRIM_SPECIES=Homo_sapiens
+REPEATMASKER_SPECIES="Primates"
+# TRIM_SPECIES must not have any spaces in it.  It appears to be just
+# to be used for filenames
+TRIM_SPECIES=marmoset
 # Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
 BLAST_SEED_SIZE=250
 # This is the first step in the WGAC pipeline
