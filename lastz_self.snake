@@ -73,6 +73,31 @@ rule run_lastz_on_one_batch_of_fugu_files:
            szOutput = "selfblast/" + szFuguFile + ".intf"
            szInput = "fugu2/" + szFuguFile
 
+           # check if the file has any sequence in it (otherwise lastz
+           # will crash)
+
+           bSomeSequence = False
+           with open( szInput, "r" ) as fFugu2Seq:
+              nLines = 0
+              while( True ):
+                 szLine = fFugu2Seq.readline()
+                 if ( szLine == "" ):
+                    break
+                 else:
+                    nLines += 1
+                    if ( nLines > 1 ):
+                       bSomeSequence = True
+                       break
+                    
+           if ( not bSomeSequence ):
+              # put enough in the output file so the parsers don't choke
+              with open( szOutput, "w" ) as fOutput:
+                 fOutput.write( "#:lav " + szInput + " had no sequence--that's ok\n" )
+
+              # prevent lastz from running
+              continue
+
+
            szCommand = "module load lastz/1.02.00 && lastz " + szInput + " " + szParameters + " >" + szOutput
            print( "about to execute: " + szCommand )
            shell( szCommand )
