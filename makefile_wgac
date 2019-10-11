@@ -241,7 +241,7 @@ fasta : fastawholesplit
 
 fastawholesplit : fastawhole
 	mkdir -p $@
-	module load python/2.7.3 && cat fastawhole/* | ~/bin/split_fasta_file.py stdin -d fastawholesplit
+	module load python/2.7.3 && cat fastawhole/* | ./split_fasta_file.py stdin -d fastawholesplit
 	cd fastawholesplit && rename ".fasta" "" *
 
 fastalength.log : fastawholesplit
