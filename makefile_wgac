@@ -17,7 +17,7 @@ BLAST_SEED_SIZE=250
 #
 
 # fastalength.log is needed for some things in makefile_partB
-all : fugu2 data/bo_self.parse fastalength.log
+all : fugu2 data/inter_block.parse fastalength.log
 
 
 
@@ -45,7 +45,7 @@ all : fugu2 data/bo_self.parse fastalength.log
 
 .PHONY : all_stats plots
 
-all : fastalength.log fasta mask_out_done fugu blastdb/bofugu.nsq blastout data/bo_self.parse fugu2 lastz_self_done data/lav_int2.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
+all : fastalength.log fasta mask_out_done fugu blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2 lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
 
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
@@ -181,11 +181,11 @@ data/step_8_mpi/defugu : data/both.parse.defugu
 data/both.parse.defugu : data/both.parse
 	blast_defuguize_hit_by_hit.pl -t $^ -d .
 
-data/both.parse : data/bo_self.parse data/lav_int2.parse
+data/both.parse : data/inter_block.parse data/intra_block.parse
 	cp $< $@
 	sed 1d $(lastword $^) >> $@
 
-data/lav_int2.parse : lastz_self_done
+data/intra_block.parse : lastz_self_done
 	mkdir -p tmp
 	# changes for lastz instead of the Sun program webb_self (DG, July 15, 2019)
 	#export PERL5LIB=./JABPerlMod; blast_lav_break_self_overlap2_for_lastz.pl --in selfblast --out tmp
@@ -202,20 +202,20 @@ fugu2 : fugu
 	cp -r $^ $@
 	fasta_only_ATCGN.pl -p $@ -o $@ -u
 
-data/bo_self.parse : blastout
-	perl ./rmNohitfiles.pl $^
+data/inter_block.parse : blastout_done
+	perl ./rmNohitfiles.pl blastout
 	find $^ -type f -exec grep -L 'Matrix' {} \;
 	# /usr/bin/perl must be used--not one of the perl modules
 	export PATH=/usr/bin:$PATH
 	blastparser42.pl -in ./blastout \
-		-out data/bo_self.parse \
+		-out data/inter_block.parse \
 		-noprevq -v \
 		-output '-ssort=>name, -hsort=>qb' \
 		-filter '-min_bpalign=>$(BLAST_SEED_SIZE), -min_fracbpmatch=>0.88, -max_%gap =>40, -no_subject_self => yes, -no_doubleoverlap=>score'
 
-blastout : blastdb/bofugu.nsq
+blastout_done : blastdb/bofugu.nsq
 	mkdir -p blastout
-	qsub -pe orte 50 -N wgac_blast_$(TRIM_SPECIES) -q eichler-short.q -l h_rt=8:00:00 -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb
+	qsub -pe orte 50 -N wgac_blast_$(TRIM_SPECIES) -q eichler-short.q -l h_rt=8:00:00 -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb && touch blastout_done
 
 blastdb/bofugu.nsq : fugu
 	mkdir -p blastdb
