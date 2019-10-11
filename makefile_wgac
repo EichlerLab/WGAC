@@ -7,7 +7,7 @@ FASTAWHOLE_DIR=fastawhole
 REPEATMASKER_SPECIES="Primates"
 # TRIM_SPECIES must not have any spaces in it.  It appears to be just
 # to be used for filenames
-TRIM_SPECIES=marmoset
+TRIM_SPECIES=gibbon
 # Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
 BLAST_SEED_SIZE=250
 # This is the first step in the WGAC pipeline
@@ -41,7 +41,7 @@ all : fugu2 data/bo_self.parse fastalength.log
 # 14. make all_stats
 
 # for now, just make GenomicSuperDup.tab
-all2 : data/GenomicSuperDup.tab
+#all2 : data/GenomicSuperDup.tab
 
 .PHONY : all_stats plots
 
@@ -156,7 +156,7 @@ data/align_both : fasta data/both.parse.defugu.trim.fixed.trim.defrac
 	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -q eichler-short.q -l h_rt=16:00:00 -sync y ./sge_commands.sh sge_align_batch_110k.sh
 	rm -rf both_tmp
 
-data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawhole
+data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawholesplit
 	blast_defractionate3.pl -s 400000 -t $< -f $(lastword $^) -o $@
 
 data/both.parse.defugu.trim.fixed.trim : data/both.parse.defugu.trim
@@ -241,7 +241,7 @@ fasta : fastawholesplit
 
 fastawholesplit : fastawhole
 	mkdir -p $@
-	cat fastawhole/* | ~/bin/split_fasta_file.py stdin -d fastawholesplit
+	module load python/2.7.3 && cat fastawhole/* | ~/bin/split_fasta_file.py stdin -d fastawholesplit
 	cd fastawholesplit && rename ".fasta" "" *
 
 fastalength.log : fastawholesplit
