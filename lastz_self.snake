@@ -23,7 +23,7 @@ if ( os.path.exists( "lastz_self.json" ) ):
    configfile: "lastz_self.json"
    szParameters = config[ "parameters" ]
 else:
-   szParameters = " --format=lav --self B=2 O=180 E=1 W=14 Y=1400 --match=10,75 "
+   szParameters = " --format=lav --self B=2 O=180 E=1 W=14 Y=1400 --match=30,75 "
 
 
 
