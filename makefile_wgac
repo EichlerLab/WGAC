@@ -194,7 +194,7 @@ data/intra_block.parse : lastz_self_done
 		-options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
 	rm -rf tmp
 
-lastz_self_done : 
+lastz_self_done : fugu2
 	run_lastz_self.snake.sh
 
 
