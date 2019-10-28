@@ -1,25 +1,14 @@
 # This makefile will run the WGAC pipeline.  (DG, Aug 2019)
 # see:  https://eichlerlab.gs.washington.edu/help/wiki/doku.php?id=methods:pipelines:wgac#defuguize_regions
-# make fastawhole a link to the genome such as:
-# fastawhole -> /net/eichler/vol2/eee_shared/assemblies/hg19/chromosomes
+# edit REPEATMASKER_SPECIES
+# make an fofn of the sequences called fastawhole.fofn
 
-FASTAWHOLE_DIR=fastawhole
-REPEATMASKER_SPECIES="Primates"
+REPEATMASKER_SPECIES="Homo sapiens"
 # TRIM_SPECIES must not have any spaces in it.  It appears to be just
 # to be used for filenames
-TRIM_SPECIES=gibbon
+TRIM_SPECIES=anything
 # Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
 BLAST_SEED_SIZE=250
-# This is the first step in the WGAC pipeline
-# This makefile is for running the pipeline to prepare fugu2 for
-# running on the Sun.  (DG, June 2017)
-# see:  https://eichlerlab.gs.washington.edu/help/wiki/doku.php?id=methods:pipelines:wgac#defuguize_regions
-#
-
-# fastalength.log is needed for some things in makefile_partB
-all : fugu2 data/inter_block.parse fastalength.log
-
-
 
 
 
@@ -45,7 +34,7 @@ all : fugu2 data/inter_block.parse fastalength.log
 
 .PHONY : all_stats plots
 
-all : fastalength.log fasta mask_out_done fugu blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2 lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
+all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
 
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
@@ -145,7 +134,7 @@ data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alig
 data/both.alignscorerdata : data/align_both
 	align_scorer_batch2.pl -a $< -d data/align_both_data -p both -o $@
 
-data/align_both : fasta data/both.parse.defugu.trim.fixed.trim.defrac
+data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
 	./wgacAlign.sh fasta >sge_align_batch.sh
 	chmod +x sge_align_batch.sh
 	qsub -N global_align_$(TRIM_SPECIES) -pe orte 25 -q eichler-short.q -l h_rt=24:00:00 -sync y ./sge_commands.sh sge_align_batch.sh
@@ -156,8 +145,8 @@ data/align_both : fasta data/both.parse.defugu.trim.fixed.trim.defrac
 	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -q eichler-short.q -l h_rt=16:00:00 -sync y ./sge_commands.sh sge_align_batch_110k.sh
 	rm -rf both_tmp
 
-data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawholesplit
-	blast_defractionate3.pl -s 400000 -t $< -f $(lastword $^) -o $@
+data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawholesplit_done
+	blast_defractionate3.pl -s 400000 -t $< -f fastawholesplit -o $@
 
 data/both.parse.defugu.trim.fixed.trim : data/both.parse.defugu.trim
 	blast_align_by_align_overlap_fix3.pl -i $<
@@ -194,13 +183,14 @@ data/intra_block.parse : lastz_self_done
 		-options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
 	rm -rf tmp
 
-lastz_self_done : fugu2
+lastz_self_done : fugu2_done
 	run_lastz_self.snake.sh
 
 
-fugu2 : fugu
-	cp -r $^ $@
-	fasta_only_ATCGN.pl -p $@ -o $@ -u
+fugu2_done : fugu_done
+	cp -r fugu fugu2
+	fasta_only_ATCGN.pl -p fugu2 -o fugu2 -u
+	touch fugu2_done    
 
 data/inter_block.parse : blastout_done
 	perl ./rmNohitfiles.pl blastout
@@ -215,34 +205,38 @@ data/inter_block.parse : blastout_done
 
 blastout_done : blastdb/bofugu.nsq
 	mkdir -p blastout
-	qsub -pe orte 50 -N wgac_blast_$(TRIM_SPECIES) -q eichler-short.q -l h_rt=8:00:00 -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb && touch blastout_done
+	qsub -pe orte 50 -N wgac_blast_$(TRIM_SPECIES) -q eichler-short.q -l h_rt=8:00:00 -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb 
+	touch blastout_done
 
-blastdb/bofugu.nsq : fugu
+blastdb/bofugu.nsq : fugu_done
 	mkdir -p blastdb
-	dir_cat $^ blastdb/bofugu
+	dir_cat fugu blastdb/bofugu
 	formatdb -i blastdb/bofugu -o F -p F -a F
 	rm -f blastdb/bofugu
 
-fugu : fasta mask_out_done
-	mkdir -p $@
-	fasta_fuguize_batch.pl -f $< -r mask_out -o $@
+fugu_done : fasta_done mask_out_done
+	mkdir -p fugu
+	fasta_fuguize_batch.pl -f fasta -r mask_out -o fugu
+	touch fugu_done
 
 
-mask_out_done : fasta
+mask_out_done : fasta_done
 	mkdir -p mask_out
-	ls $< |xargs -i perl ./maskOutGenFromLowCase.pl fasta/{} mask_out/{}.out
+	ls fasta |xargs -i perl ./maskOutGenFromLowCase.pl fasta/{} mask_out/{}.out
 	mkdir -p data
 	touch mask_out_done
 
-fasta : fastawholesplit
-	mkdir -p $@
-	fasta_fractionate -f $^ -s 400000 -o $@
+fasta_done : fastawholesplit_done
+	mkdir -p fasta
+	fasta_fractionate -f fastawholesplit -s 400000 -o fasta
+	touch fasta_done
 
 
-fastawholesplit : fastawhole
-	mkdir -p $@
-	module load python/2.7.3 && cat fastawhole/* | ./split_fasta_file.py stdin -d fastawholesplit
+fastawholesplit_done : fastawhole.fofn
+	mkdir -p fastawholesplit
+	module load python/2.7.3 && cat `cat fastawhole.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
 	cd fastawholesplit && rename ".fasta" "" *
+	touch fastawholesplit_done
 
-fastalength.log : fastawholesplit
-	fasta_length -d $^/ -o $@ -f
+fastalength.log : fastawholesplit_done
+	fasta_length -d fastawholesplit -o $@ -f
