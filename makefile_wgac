@@ -205,7 +205,7 @@ data/inter_block.parse : blastout_done
 
 blastout_done : blastdb/bofugu.nsq
 	mkdir -p blastout
-	qsub -pe orte 50 -N wgac_blast_$(TRIM_SPECIES) -q eichler-short.q -l h_rt=8:00:00 -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb 
+	qsub -pe orte 50 -N wgac_blast_$(TRIM_SPECIES) -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb 
 	./checkIfBlastSucceeded.sh
 	touch blastout_done
 
