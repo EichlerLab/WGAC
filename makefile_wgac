@@ -131,19 +131,23 @@ data/oo.weild10kb.join.all : data/defrac.align
 data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata
 	table_merger.pl -s'row(\d+):both(\d+)' -i $<:$(lastword $^) -o $@
 
-data/both.alignscorerdata : data/align_both
+#data/both.alignscorerdata : data/align_both
+data/both.alignscorerdata : data/align_both align_both_done
 	align_scorer_batch2.pl -a $< -d data/align_both_data -p both -o $@
 
-data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
+#data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
+align_both_done : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
 	./wgacAlign.sh fasta >sge_align_batch.sh
 	chmod +x sge_align_batch.sh
-	qsub -N global_align_$(TRIM_SPECIES) -pe orte 25 -q eichler-short.q -l h_rt=24:00:00 -sync y ./sge_commands.sh sge_align_batch.sh
+	qsub -N global_align_$(TRIM_SPECIES) -pe orte 25 -sync y ./sge_commands.sh sge_align_batch.sh
 	rm -rf both_tmp/both*
 	rm -rf both_tmp
 	./wgacAlign.sh fasta 110000 >sge_align_batch_110k.sh
 	chmod +x sge_align_batch_110k.sh
-	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -q eichler-short.q -l h_rt=16:00:00 -sync y ./sge_commands.sh sge_align_batch_110k.sh
+	qsub -N global_align_$(TRIM_SPECIES) -pe orte 2-10 -sync y ./sge_commands.sh sge_align_batch_110k.sh
 	rm -rf both_tmp
+	./checkIfWgacAlignSucceeded.sh
+	touch align_both_done
 
 data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawholesplit_done
 	blast_defractionate3.pl -s 400000 -t $< -f fastawholesplit -o $@
@@ -151,15 +155,19 @@ data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixe
 data/both.parse.defugu.trim.fixed.trim : data/both.parse.defugu.trim
 	blast_align_by_align_overlap_fix3.pl -i $<
 
-data/both.parse.defugu.trim : data/step_8_mpi/trim
+#data/both.parse.defugu.trim : data/step_8_mpi/trim
+data/both.parse.defugu.trim : data/step_8_mpi/trim trim_ends_done
 	perl ./collectTrim.pl $<
 	mv data/step_8_mpi/trim/ParallelOutput.trim $@
 
-data/step_8_mpi/trim : data/step_8_mpi/defugu
-	mkdir -p $@
+#data/step_8_mpi/trim : data/step_8_mpi/defugu
+trim_ends_done : data/step_8_mpi/defugu
+	mkdir -p data/step_8_mpi/trim
 	./make_trim_jobs.sh ${TRIM_SPECIES} >trim-ends_${TRIM_SPECIES}.sh
 	chmod +x trim-ends_${TRIM_SPECIES}.sh
-	qsub -N trim-ends_${TRIM_SPECIES} -pe orte 25 -q eichler-short.q -l h_rt=16:00:00 -sync y ./sge_commands.sh trim-ends_${TRIM_SPECIES}.sh
+	qsub -N trim-ends_${TRIM_SPECIES} -pe orte 25 -sync y ./sge_commands.sh trim-ends_${TRIM_SPECIES}.sh
+	./checkIfTrimEndsSucceeded.sh
+	touch trim_ends_done
 
 data/step_8_mpi/defugu : data/both.parse.defugu
 	mkdir -p $@
