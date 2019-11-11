@@ -1,4 +1,4 @@
-nFuguSize=`ls fugu2/* | wc -l`
+nFuguSize=`ls fugu/* | wc -l`
 nBlastoutSize=`ls blastout/* | wc -l`
 
 if [ $nFuguSize -eq $nBlastoutSize ]
