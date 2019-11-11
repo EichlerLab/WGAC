@@ -34,7 +34,7 @@ BLAST_SEED_SIZE=250
 
 .PHONY : all_stats plots
 
-all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/align_both data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
+all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen
 
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
@@ -132,8 +132,8 @@ data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alig
 	table_merger.pl -s'row(\d+):both(\d+)' -i $<:$(lastword $^) -o $@
 
 #data/both.alignscorerdata : data/align_both
-data/both.alignscorerdata : data/align_both align_both_done
-	align_scorer_batch2.pl -a $< -d data/align_both_data -p both -o $@
+data/both.alignscorerdata : align_both_done
+	align_scorer_batch2.pl -a data/align_both -d data/align_both_data -p both -o $@
 
 #data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
 align_both_done : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
@@ -156,8 +156,8 @@ data/both.parse.defugu.trim.fixed.trim : data/both.parse.defugu.trim
 	blast_align_by_align_overlap_fix3.pl -i $<
 
 #data/both.parse.defugu.trim : data/step_8_mpi/trim
-data/both.parse.defugu.trim : data/step_8_mpi/trim trim_ends_done
-	perl ./collectTrim.pl $<
+data/both.parse.defugu.trim : trim_ends_done
+	perl ./collectTrim.pl data/step_8_mpi/trim 
 	mv data/step_8_mpi/trim/ParallelOutput.trim $@
 
 #data/step_8_mpi/trim : data/step_8_mpi/defugu
