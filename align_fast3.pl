@@ -130,11 +130,18 @@ sub align_fast {
 	my (@p1,@p2,@p1_last,@p2_last);
 	my ($s1_b,$s2_b)=($b1,$b2);
 	my ($s1_b_last,$s2_b_last)=(0,0);
-	my ($s2_e,$s1_e);
+	my ($s1_e_last,$s2_e_last)=(0,0);
+	my ($s2_e,$s1_e) = (-666, -666); # just to initialize
 	MAIN:while(1==1) {
+        $s1_b_last = $s1_b;
+        $s1_e_last = $s1_e;
+        $s2_b_last = $s2_b;
+        $s2_e_last = $s2_e;
 		$s1_e=$s1_b+$frag_size-1;
 	 	$s1_e=$e1 if $s1_e>$e1;
+
 		if($s1_e>$e1-1000) { $s1_e=$e1; $s2_e=$e2;} #take on a thousand if it can finish
+
 	 	if ($b2<$e2) {
 			$s2_e=$s2_b+$frag_size-1;
 			$s2_e =$e2 if $s2_e>$e2;
@@ -142,6 +149,21 @@ sub align_fast {
 			$s2_e=$s2_b-$frag_size+1;
 			$s2_e=$e2 if $s2_e<$e2;
 	 	}
+
+        # added Dec 17, 2019 (DG)
+        if ( ( $s1_b_last == $s1_b ) &&
+             ( $s1_e_last == $s1_e ) &&
+             ( $s2_b_last == $s2_b ) &&
+             ( $s2_e_last == $s2_e ) ) {
+            # this iteration of the loop will align exactly the same
+            # 2 pieces as before.  And probably the next and the next
+            # will do the same.  So in infinite loop.
+
+            die "in infinite loop of align_fast3.pl\n"
+        }
+        # end of added code
+
+
 		#####EXTRACT SUBSEQUENCES AND RUN #######
 		my $command="$FindBin::Bin/fasta_subseq33.pl -f $s1_path -o frag1_$r -b $s1_b -e $s1_e -F $opt_b";
 		print "SUBSEQ1\n$command\n";
@@ -151,7 +173,7 @@ sub align_fast {
 		$command = "$FindBin::Bin/fasta_subseq33.pl -f $s2_path -o frag2_$r -b $s2_e -e $s2_b -F -r $opt_b" if $b2>$e2;
 		print "SUBSEQ2\n$command\n";
 		system $command;
-		print "ALIGN\n";
+		print "ALIGN using command: $align_path -f $args{'-f'} -g $args{'-g'}  frag1_$r frag2_$r  > alignout_$r\n";
 		system "$align_path -f $args{'-f'} -g $args{'-g'}  frag1_$r frag2_$r  > alignout_$r";
 		
 		($align_frag1_last,$align_frag2_last)=($align_frag1,$align_frag2);
