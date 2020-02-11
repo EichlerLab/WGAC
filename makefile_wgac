@@ -164,8 +164,8 @@ data/both.parse.defugu.trim : trim_ends_done
 trim_ends_done : data/step_8_mpi/defugu
 	mkdir -p data/step_8_mpi/trim
 	./make_trim_jobs.sh ${TRIM_SPECIES} >trim-ends_${TRIM_SPECIES}.sh
-	chmod +x trim-ends_${TRIM_SPECIES}.sh
-	qsub -N trim-ends_${TRIM_SPECIES} -pe orte-testing 25 -sync y ./sge_commands.sh trim-ends_${TRIM_SPECIES}.sh
+	./run_trim_ends.snake.sh
+	#qsub -N trim-ends_${TRIM_SPECIES} -pe orte-testing 25 -sync y ./sge_commands.sh trim-ends_${TRIM_SPECIES}.sh
 	./checkIfTrimEndsSucceeded.sh
 	touch trim_ends_done
 

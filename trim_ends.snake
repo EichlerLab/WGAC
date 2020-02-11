@@ -1,0 +1,57 @@
+import re
+
+
+if not os.path.exists("log"):
+    os.makedirs("log")
+
+
+
+localrules: all_files
+
+
+
+#dictInputFile = {}
+dictCommand = {}
+
+with open( "trim-ends_anything.sh", "r" ) as fListOfJobs:
+     
+     for szLine in fListOfJobs.readlines():
+          if ( not szLine.startswith( "perl" ) ):
+               # get rid of:
+               # #!/bin/bash
+               # #$ -S /bin/bash
+               # #$ -cwd
+
+               continue
+          
+          
+          # looks like:
+          # perl /net/eichler/vol26/7200/dgordon/bonobo/wgac/Trim.pl /net/eichler/vol26/7200/dgordon/bonobo/wgac/data/step_8_mpi/defugu/10 /net/eichler/vol26/7200/dgordon/bonobo/wgac/fasta /net/eichler/vol26/7200/dgordon/bonobo/wgac/data/step_8_mpi/trim anything
+          # 0       1                                                   2                                                                    3                                                     4                                                            5
+
+          aWords = szLine.split()
+          szInputFile = aWords[2]
+          aWords2 = szInputFile.split( '/' )
+          szKey = aWords2[-1]
+          szOutputFile = re.sub( r'defugu', 'trim', szInputFile ) + "/" + szKey + ".trim"
+          #print( "input: " + szInputFile )
+          #print( " output: " + szOutputFile )
+
+          #dictInputFile[ szOutputFile ] = szInputFile
+          dictCommand[ szOutputFile ] = szLine
+
+
+
+rule all_files:
+	input: expand( "{szOutputFile}", szOutputFile = list( dictCommand.keys() ) )
+
+rule trim_one_file:
+	output: os.path.dirname(workflow.snakefile) + "/data/step_8_mpi/trim/{szKey}/{szKey}.trim"
+	input: os.path.dirname(workflow.snakefile) + "/data/step_8_mpi/defugu/{szKey}"
+        params: sge_opts="-l mfree=4G"
+	run:
+		# this is so it runs /usr/bin/perl
+		szCommand = "module purge; " + dictCommand[ str( output ) ]
+		print( "about to execute: " + szCommand )
+		shell( szCommand )
+
