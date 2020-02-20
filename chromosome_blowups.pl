@@ -177,7 +177,13 @@ foreach my $chr (@chr) {
         next;
     }
 
-    my $command= "parasight751.pl  -showseq $these_chrs -arrangeseq file:chr.layout -extra chr.extras -align chr.alignments -template /net/eichler/vol4/home/jlhudd/wgac/parasight/blowups.pst";
+    my $command= "../parasight751.pl  -showseq $these_chrs -arrangeseq file:chr.layout -extra chr.extras -align chr.alignments -template ../blowups.pst";
+
+
+    # changed Feb 20, 2020 due to John's home directory move
+    # my $command= parasight751.pl  -showseq $these_chrs -arrangeseq file:chr.layout -extra chr.extras -align chr.alignments -template /net/eichler/vol4/home/jlhudd/wgac/parasight/blowups.pst";
+
+
 
     $command .= " -options '-pair_level=>intra_over_inter, -sub_on=>0, -pair_intra_line_on=>1, -pair_inter_line_on=>1, -pair_type_col=>0, -pair_type_col2=>4,-seq_tick_whole=>0, -seq_tick_on=>0,-seq_tick_b_on=>0, -seq_tick_e_on=>0, -filename_on=>0'";
 
