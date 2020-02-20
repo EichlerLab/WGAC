@@ -40,7 +40,7 @@ all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blas
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
 plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
-	pushd stats; Rscript ../plot.R; popd;
+	module load mpc/0.8.2 mpfr/3.1.0 gmp/5.0.2 gcc/4.9.1; module load hdf5/1.8.13; module load netcdf/4.3.2; module load R/3.1.0; pushd stats; Rscript ../plots.R; popd; ./for_parasight.sh
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
@@ -132,22 +132,42 @@ data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alig
 	table_merger.pl -s'row(\d+):both(\d+)' -i $<:$(lastword $^) -o $@
 
 #data/both.alignscorerdata : data/align_both
-data/both.alignscorerdata : align_both_done
+data/both.alignscorerdata : global_align_110k_done
 	align_scorer_batch2.pl -a data/align_both -d data/align_both_data -p both -o $@
 
-#data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
-align_both_done : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
-	./wgacAlign.sh fasta >sge_align_batch.sh
-	chmod +x sge_align_batch.sh
-	qsub -N global_align_$(TRIM_SPECIES) -pe orte-testing 25 -sync y ./sge_commands.sh sge_align_batch.sh
+# #data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
+# align_both_done : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
+# 	./wgacAlign.sh fasta >sge_align_batch.sh
+# 	chmod +x sge_align_batch.sh
+# 	qsub -N global_align_$(TRIM_SPECIES) -pe orte-testing 25 -sync y ./sge_commands.sh sge_align_batch.sh
+# 	rm -rf both_tmp/both*
+# 	rm -rf both_tmp
+# 	./wgacAlign.sh fasta 110000 >sge_align_batch_110k.sh
+# 	chmod +x sge_align_batch_110k.sh
+# 	qsub -N global_align_$(TRIM_SPECIES) -pe orte-testing 2-10 -sync y ./sge_commands.sh sge_align_batch_110k.sh
+# 	rm -rf both_tmp
+# 	./checkIfWgacAlignSucceeded.sh
+# 	touch align_both_done
+
+
+global_align_110k_done: made_sge_align_batch_110k
+	./run_global_align_110k.snake.sh && touch global_align_110k_done
+
+made_sge_align_batch_110k: global_align_done
 	rm -rf both_tmp/both*
 	rm -rf both_tmp
 	./wgacAlign.sh fasta 110000 >sge_align_batch_110k.sh
-	chmod +x sge_align_batch_110k.sh
-	qsub -N global_align_$(TRIM_SPECIES) -pe orte-testing 2-10 -sync y ./sge_commands.sh sge_align_batch_110k.sh
+	touch made_sge_align_batch_110k
+
+
+global_align_done: made_sge_align_batch
+	./run_global_align.snake.sh
+
+made_sge_align_batch: fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
+	rm -rf both_tmp/both*
 	rm -rf both_tmp
-	./checkIfWgacAlignSucceeded.sh
-	touch align_both_done
+	./wgacAlign.sh fasta >sge_align_batch.sh
+	touch made_sge_align_batch
 
 data/both.parse.defugu.trim.fixed.trim.defrac : data/both.parse.defugu.trim.fixed.trim fastawholesplit_done
 	blast_defractionate3.pl -s 400000 -t $< -f fastawholesplit -o $@

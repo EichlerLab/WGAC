@@ -1,0 +1,72 @@
+import re
+import os
+
+
+if not os.path.exists("log"):
+    os.makedirs("log")
+
+
+
+localrules: all_global_alignments
+
+
+
+dictCommand = {}
+
+
+
+with open( "sge_align_batch_110k.sh", "r" ) as fListOfJobs:
+     n1Line = 0
+     
+     while True:
+         szLine = fListOfJobs.readline()
+
+         if ( szLine == "" ):
+             break
+
+         n1Line += 1
+         # looks like:
+
+         # 0 mkdir
+         # 1 -p
+         # 2 /net/eichler/vol26/7200/dgordon/bonobo/wgac/both_tmp/both0000037;cd
+         # 3 /net/eichler/vol26/7200/dgordon/bonobo/wgac/both_tmp/both0000037;/net/eichler/vol26/7200/dgordon/bonobo/wgac/align_fast3.pl
+         # 4 -i
+         # 5 /net/eichler/vol26/7200/dgordon/bonobo/wgac/fasta/chr10:8:10761
+         # 6 -j
+         # 7 /net/eichler/vol26/7200/dgordon/bonobo/wgac/fasta/chr2b:14060:24121
+         # 8 -l
+         # 9 60000
+         # 10 -o
+         # 11 /net/eichler/vol26/7200/dgordon/bonobo/wgac/data/align_both/0000/both0000037
+         # 12 -f
+         # 13 -40
+         # 14 -g
+         # 15 -1
+         # 16 -b
+         # 17 400000;cd
+         # 18 /net/eichler/vol26/7200/dgordon/bonobo/wgac;rm
+         # 19 -rf
+         # 20 /net/eichler/vol26/7200/dgordon/bonobo/wgac/both_tmp/both0000037
+
+
+         szCommand = re.sub( r';', ' && ', szLine.rstrip() )
+         szCommand += " && touch global_align_110k_flags/"
+         szCommand += str( n1Line )
+
+         dictCommand[ n1Line ] = szCommand
+
+rule all_global_alignments:
+	input: expand( "global_align_110k_flags/{nNumber}", nNumber = list( dictCommand.keys() ) )
+        output: "global_align_done"
+        shell: "touch global_align_110k_done"
+
+rule run_one_global_alignment:
+	output: "global_align_110k_flags/{nNumber}"
+        params: sge_opts="-l mfree=4G"
+	run:
+		szCommand = dictCommand[ int(wildcards.nNumber) ]
+		print( "about to execute: " + szCommand )
+		shell( szCommand )
+
+
