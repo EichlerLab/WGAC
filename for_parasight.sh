@@ -90,7 +90,11 @@ cd ..
 mkdir -p blowups
 cd blowups
 
-../fasta_findNs.pl -i ../fastawhole -o gap.log
+# needed because chromosome_blowups.pl calls parasight751.pl
+ln -sf ../parasight751.pl
+
+
+../fasta_findNs.pl -i ../fastawholesplit -o gap.log
 sed -i 's/.fa//' gap.log
 
 head -n 1 gap.log > 5kgap.extra
