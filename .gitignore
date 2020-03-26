@@ -35,8 +35,6 @@ made_sge_align_batch_110k
 makefile_wgac.out*
 mask_out/
 mask_out_done
-run_global_align.snake.sh
-run_global_align_110k.snake.sh
 selfblast/
 sge_align_batch.sh
 sge_align_batch_110k.sh
