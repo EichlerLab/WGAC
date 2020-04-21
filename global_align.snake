@@ -82,12 +82,11 @@ with open( "sge_align_batch.sh", "r" ) as fListOfJobs:
                  szCommandsForCurrentJob = ""
              
 
-     print( "job numbers are: " , list( dictCommand.keys() ) )
+     #print( "job numbers are: " , list( dictCommand.keys() ) )
 
 rule all_global_alignments:
 	input: expand( "global_align_flags/{nNumber}", nNumber = list( dictCommand.keys() ) )
-        output: "global_align_done"
-        shell: "touch global_align_done"
+	output: touch( "global_align_done" )
 
 rule run_one_global_alignment:
 	output: "global_align_flags/{nNumber}"
