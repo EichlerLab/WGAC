@@ -58,8 +58,7 @@ with open( "sge_align_batch_110k.sh", "r" ) as fListOfJobs:
 
 rule all_global_alignments:
 	input: expand( "global_align_110k_flags/{nNumber}", nNumber = list( dictCommand.keys() ) )
-        output: "global_align_done"
-        shell: "touch global_align_110k_done"
+	output: touch( "global_align_110k_done" )
 
 rule run_one_global_alignment:
 	output: "global_align_110k_flags/{nNumber}"
