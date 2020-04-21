@@ -1,9 +1,7 @@
 # This makefile will run the WGAC pipeline.  (DG, Aug 2019)
 # see:  https://eichlerlab.gs.washington.edu/help/wiki/doku.php?id=methods:pipelines:wgac#defuguize_regions
-# edit REPEATMASKER_SPECIES
 # make an fofn of the sequences called fastawhole.fofn
 
-REPEATMASKER_SPECIES="Pan troglodytes"
 # TRIM_SPECIES must not have any spaces in it.  It appears to be just
 # to be used for filenames
 TRIM_SPECIES=anything
@@ -151,7 +149,7 @@ data/both.alignscorerdata : global_align_110k_done
 
 
 global_align_110k_done: made_sge_align_batch_110k
-	./run_global_align_110k.snake.sh && touch global_align_110k_done
+	./run_global_align_110k.snake.sh
 
 made_sge_align_batch_110k: global_align_done
 	rm -rf both_tmp/both*
@@ -233,6 +231,7 @@ data/inter_block.parse : blastout_done
 
 blastout_done : blastdb/bofugu.nsq
 	mkdir -p blastout
+	# for time being, run under centos6
 	qsub -pe orte-testing 50 -N wgac_blast_$(TRIM_SPECIES) -sync y ./blast64.sh -t /var/tmp/$(shell whoami)/$(TRIM_SPECIES)/blastdb 
 	./checkIfBlastSucceeded.sh
 	touch blastout_done
@@ -263,7 +262,7 @@ fasta_done : fastawholesplit_done
 
 fastawholesplit_done : fastawhole.fofn
 	mkdir -p fastawholesplit
-	module load python/2.7.3 && cat `cat fastawhole.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
+	module load python/2.7.13 && cat `cat fastawhole.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
 	cd fastawholesplit && rename ".fasta" "" *
 	touch fastawholesplit_done
 
