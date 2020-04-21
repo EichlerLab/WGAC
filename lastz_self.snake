@@ -1,10 +1,6 @@
 # construct targets
 
 
-
-
-
-
 import glob
 import re
 import os
@@ -17,6 +13,9 @@ import subprocess
 # force always remaking the batches file
 # didn't work--kept deleting it.
 #shell( "rm -f batches_for_lastz_self.tab" )
+
+if not os.path.exists("log"):                                                                          os.makedirs("log")                                                                                     
+
 
 
 if ( os.path.exists( "lastz_self.json" ) ):
