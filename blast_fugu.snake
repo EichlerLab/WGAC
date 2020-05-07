@@ -1,0 +1,51 @@
+# run blast on all files in fugu
+# replace qsub -pe orte blast64.sh
+
+import glob
+
+
+if not os.path.exists("log"):
+    os.makedirs("log")
+
+
+aFuguFilesNoDir = []
+for szFile in glob.glob("fugu/*" ):
+    szFileNoDir = os.path.basename( szFile )
+    # debugging
+    print( szFileNoDir )
+    # end debugging
+    aFuguFilesNoDir.append( szFileNoDir )
+
+
+# comments from blast64.sh:
+# blastall is v2.2.11, not much different than 2.2.20
+# -p blastn (program name)
+# -d /net/eichler/vol4/home/linchen2/wgac/GRCh37/blastdb/bofugu (database)
+
+# -z 3000000000 (?? effective length of database, useful for maintaining consistent statistics as databases grow ??)
+# -Y 3000000000 (?? effective length of the search space = db size * query ??)
+# http://etutorials.org/Misc/blast/Part+V+BLAST+Reference/Chapter+13.+NCBI-BLAST+Reference/13.3+blastall+Parameters/
+
+# -v 5000 (?? # of database seqs to show one-line descriptions)
+# -b 5000 (# of database seqs to show alignments)
+
+# -G 180 (gap open cost)
+# -E 1 (gap extension cost)
+# -q -80 (nuc mismatch penalty)
+# -r 30 (nuc match reward)
+# -e 1e-30 (e-value)
+# -F F (don't filter query seq)
+    
+
+rule blast_all_fugu_files:
+	input: expand( "blastout/{szFileNoDir}.bo", szFileNoDir = aFuguFilesNoDir )
+
+
+rule blast_on_fugu_file:
+	output: "blastout/{szFileNoDir}.bo"
+	input: "fugu/{szFileNoDir}"
+	params: sge_opts=" -l mfree=8G"
+	run:
+		szCommand = "./blastall -p blastn -i " + str( input ) + " -o " + str( output ) + " -d blastdb/bofugu -v 5000 -b 5000 -G 180 -E 1 -q -80 -r 30 -e 1e-30 -F F -z 3000000000 -Y 3000000000 "
+		print( "about to execute: " + szCommand )
+		shell( szCommand )
