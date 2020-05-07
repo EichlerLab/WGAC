@@ -1,6 +1,10 @@
 nFuguSize=`ls fugu/* | wc -l`
 nBlastoutSize=`ls blastout/* | wc -l`
 
+
+echo "fugu = $nFuguSize"
+echo "blastout = $nBlastoutSize"
+
 if [ $nFuguSize -eq $nBlastoutSize ]
 then
     echo "fugu and blastout are the same size"
