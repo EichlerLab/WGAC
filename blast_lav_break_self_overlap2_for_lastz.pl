@@ -74,9 +74,19 @@ sub lav_remove_self_overlap{ # FILEHANDLE
 	my $FH = $args{'FILEHANDLE'};  #too long type all the time
 	my $OH = $args{'OUTHANDLE'};
 
+    # fixed for files that have no sequence in them, but adding a single line
+    # saying: #:lav fugu2/chrUn_NW_019933191v1_000.fugu had no sequence--that's ok
+    my $bFoundHeader = 0;
 	my $line = '';	
-	$line = <$FH> until $line=~ /^\#\:lav/ || eof $FH;
-   die "End of file reached without finding #:lav header\n" if (eof $FH);
+    while( defined( $line = <$FH> ) ) {
+        if ( $line=~ /^\#\:lav/  ) {
+            $bFoundHeader = 1;
+            last;
+        }
+    }
+
+    #print "line is $line\n";
+    die "End of file reached without finding #:lav header\n" if ( ! $bFoundHeader );
 	#START PARSING SINGLE QUERY VS SINGLE SUBJECT WITH POSSIBLE REVERSE SUBJECT#
 	my $search_string='';
 	until ( $line=~/^s {/) {
