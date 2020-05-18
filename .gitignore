@@ -6,6 +6,7 @@ batches_for_lastz_self.tab
 blastdb/
 blastout/
 blastout_done
+both_tmp/
 data/
 error.log
 fasta/
@@ -27,6 +28,7 @@ global_align_*.p[eo]*
 global_align_done
 global_align_110k_done
 global_align_flags/
+global_align_110k_flags/
 globalView/
 lastz_self_done
 log/
