@@ -38,7 +38,7 @@ all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blas
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
 plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
-	module load mpc/0.8.2 mpfr/3.1.0 gmp/5.0.2 gcc/4.9.1; module load hdf5/1.8.13; module load netcdf/4.3.2; module load R/3.1.0; pushd stats; Rscript ../plots.R; popd; ./for_parasight.sh
+	module load R/3.6.1; pushd stats; Rscript ../plots.R; popd; ./for_parasight.sh
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
@@ -262,7 +262,7 @@ fasta_done : fastawholesplit_done
 
 fastawholesplit_done : fastawhole.fofn
 	mkdir -p fastawholesplit
-	module load python/2.7.3 && cat `cat fastawhole.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
+	module load python/2.7.13 && cat `cat fastawhole.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
 	cd fastawholesplit && rename ".fasta" "" *
 	touch fastawholesplit_done
 
