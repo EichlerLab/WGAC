@@ -1,0 +1,55 @@
+import glob
+import subprocess
+import re
+import os
+
+if not os.path.exists("log"):
+    os.makedirs("log")
+
+
+szCommand = "mkdir -p trf fugu_trf"
+print( "about to execute: " + szCommand )
+subprocess.call( szCommand, shell = True )
+
+
+aFastaFiles = glob.glob( "fugu/*" )
+
+
+
+aTargets = []
+for szFastaWithFugu in aFastaFiles:
+    szFasta = os.path.basename( szFastaWithFugu )
+    print( "szFasta = " + szFasta )
+    aTargets.append( szFasta )
+    
+
+rule allDone:
+	input: expand( "fugu_trf/{szTarget}", szTarget = aTargets )
+	output: touch( "fugu_trf_done" )
+
+rule runTrfOneFile:
+	output: "fugu_trf/{szFasta}"
+	input: "populate_trf_with_links_done", "trf/{szFasta}"
+	params: sge_opts=""
+	run:
+		szCommand = "cd trf && ~/bin/trf " + str( wildcards.szFasta ) + " 2 7 7 80 10 50 5 -d -h -m" 
+		print( "about to execute: " + szCommand )
+		shell( szCommand )
+
+		szTrfOutputFile = "trf/" + str( wildcards.szFasta ) + ".2.7.7.80.10.50.5.mask"
+		szCommand = "mv " + szTrfOutputFile + " " + str( output )
+		print( "about to execute: " + szCommand )
+		shell( szCommand )
+
+
+# this must be done during a prior run of snakemake.  Otherwise there
+#  won't be any fasta files in trf so allDone will be satisfied and nothing will run
+
+rule populate_trf_with_links:
+	output: touch( "populate_trf_with_links_done" )
+	message: "populate_trf_with_links"
+	run:
+
+		for szFasta in aTargets:
+		    szCommand = "ln -sf ../fugu/" + szFasta + " trf/" + szFasta
+		    subprocess.call( szCommand, shell = True )
