@@ -85,8 +85,10 @@ rule run_lastz_on_one_batch_of_fugu_files:
                  else:
                     nLines += 1
                     if ( nLines > 1 ):
-                       bSomeSequence = True
-                       break
+                       szLine = szLine.rstrip().upper()
+                       if ( ( 'A' in szLine ) or ( 'C' in szLine) or ('G' in szLine ) or ( 'T' in szLine ) or ( 'N' in szLine ) ):
+                          bSomeSequence = True
+                          break
                     
            if ( not bSomeSequence ):
               # put enough in the output file so the parsers don't choke
