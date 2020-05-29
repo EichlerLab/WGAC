@@ -9,7 +9,7 @@ if not os.path.exists("log"):
 
 
 aFuguFilesNoDir = []
-for szFile in glob.glob("fugu/*" ):
+for szFile in glob.glob("fugu_trf/*" ):
     szFileNoDir = os.path.basename( szFile )
     # debugging
     print( szFileNoDir )
@@ -43,7 +43,7 @@ rule blast_all_fugu_files:
 
 rule blast_on_fugu_file:
 	output: "blastout/{szFileNoDir}.bo"
-	input: "fugu/{szFileNoDir}"
+	input: "fugu_trf/{szFileNoDir}"
 	params: sge_opts=" -l mfree=8G"
 	run:
 		szCommand = "./blastall -p blastn -i " + str( input ) + " -o " + str( output ) + " -d blastdb/bofugu -v 5000 -b 5000 -G 180 -E 1 -q -80 -r 30 -e 1e-30 -F F -z 3000000000 -Y 3000000000 "
