@@ -10,20 +10,17 @@ BLAST_SEED_SIZE=250
 
 
 
-# Run the pipeline as follows:
+# the pipeline as follows does the following:
 #
 #  1. make Masking
 #  2. make blastout
 #  3. make selfblast
-#  4. Manually copy fugu2 to vol11, ssh to srna3, and run fugumation.pl.
 #  5. Wait for megablast to finish and for selfblast to finish.
-#  6. Manually copy selfblast from vol11 to current working directory.
 #  7. make data/step_8_mpi/trim
 #  8. Wait for end trimming to finish.
 #  9. make data/both.parse.defugu.trim.fixed.trim.defrac
-# 10. Login to eeek and run: make align_both
-# 11. Manually run wgacAlign again when it crashes the first time.
-# 12. make GenomicSuperDup.noredun.tab
+# 11. run wgacAlign again when it crashes the first time.
+# 12. make GenomicSuperDup.tab
 # 13. make plots
 # 14. make all_stats
 
@@ -131,6 +128,7 @@ data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alig
 
 #data/both.alignscorerdata : data/align_both
 data/both.alignscorerdata : global_align_110k_done
+	# data/align_both is the input I think (DG, May 2020) 
 	align_scorer_batch2.pl -a data/align_both -d data/align_both_data -p both -o $@
 
 # #data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
@@ -213,8 +211,9 @@ lastz_self_done : fugu2_done
 	run_lastz_self.snake.sh
 
 
-fugu2_done : fugu_done
-	cp -r fugu fugu2
+# create fugu2
+fugu2_done : fugu_trf_done
+	cp -r fugu_trf fugu2
 	fasta_only_ATCGN.pl -p fugu2 -o fugu2 -u
 	touch fugu2_done    
 
@@ -236,17 +235,21 @@ blastout_done : blastdb/bofugu.nsq
 	./checkIfBlastSucceeded.sh
 	touch blastout_done
 
-blastdb/bofugu.nsq : fugu_done
+blastdb/bofugu.nsq : fugu_trf_done
 	mkdir -p blastdb
-	dir_cat fugu blastdb/bofugu
+	dir_cat fugu_trf blastdb/bofugu
 	formatdb -i blastdb/bofugu -o F -p F -a F
 	rm -f blastdb/bofugu
+
+
+fugu_trf_done : fugu_done
+	./run_trf.snake.sh
+
 
 fugu_done : fasta_done mask_out_done
 	mkdir -p fugu
 	fasta_fuguize_batch.pl -f fasta -r mask_out -o fugu
 	touch fugu_done
-
 
 mask_out_done : fasta_done
 	mkdir -p mask_out
