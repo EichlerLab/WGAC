@@ -20,6 +20,8 @@ flags/
 formatdb.log
 fugu/
 fugu_done
+fugu_trf
+fugu_trf_done
 fugu2/
 fugu2_done
 generalView/
@@ -37,11 +39,13 @@ made_sge_align_batch_110k
 makefile_wgac.out*
 mask_out/
 mask_out_done
+populate_trf_with_links_done
 selfblast/
 sge_align_batch.sh
 sge_align_batch_110k.sh
 showseq.out
 stats/
+trf
 trim-ends*.sh
 trim-ends*.[eo]*
 trim-ends*.p[eo]*
