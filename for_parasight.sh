@@ -9,7 +9,10 @@ perl ../writeGenomeLengtab.pl ../fastalength.log > length_tab
 
 cd ..
 
-sed '/random/d;/chrUn/d' data/length_tab > showseq.out
+
+echo -e "seqname\tlength" >showseq.out
+
+sed '/random/d;/chrUn/d' data/length_tab | grep "^chr" | sort -V >> showseq.out
 
 mkdir -p globalView
 cd globalView
@@ -60,9 +63,38 @@ cd globalView
 ../parasight751.pl -showseq  ../showseq.out -align ../data/xw.al -template ../globalview10k.pst -option '-filterpre2_min=>20000, -filter2_col=>16, -filter2_min=>0.98, -extra_label_on=>0, -seq_tick_label_fontsize => 28, -seq_label_fontsize => 28, -printer_page_orientation=>0' -precode "&fitlongestline; &print_all(0,'parasight_20k_98');" -die;
 
 
-gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_5k.pdf parasight_5k_*.ps
-gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_10k.pdf parasight_10k_*.ps
-gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_20k.pdf parasight_20k_*.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_5k_90.pdf parasight_5k_90.01.01.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_5k_95.pdf parasight_5k_95.01.01.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_5k_98.pdf parasight_5k_98.01.01.ps
+
+
+convert -density 300 -depth 8  -background white -flatten global_view_5k_90.{pdf,png}
+convert -density 300 -depth 8  -background white -flatten global_view_5k_95.{pdf,png}
+convert -density 300 -depth 8  -background white -flatten global_view_5k_98.{pdf,png}
+
+
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_10k_90.pdf parasight_10k_90.01.01.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_10k_95.pdf parasight_10k_95.01.01.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_10k_98.pdf parasight_10k_98.01.01.ps
+
+
+convert -density 300 -depth 8  -background white -flatten global_view_10k_90.{pdf,png}
+convert -density 300 -depth 8  -background white -flatten global_view_10k_95.{pdf,png}
+convert -density 300 -depth 8  -background white -flatten global_view_10k_98.{pdf,png}
+
+
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_20k_90.pdf parasight_20k_90.01.01.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_20k_95.pdf parasight_20k_95.01.01.ps
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=global_view_20k_98.pdf parasight_20k_98.01.01.ps
+
+
+
+convert -density 300 -depth 8  -background white -flatten global_view_20k_90.{pdf,png}
+convert -density 300 -depth 8  -background white -flatten global_view_20k_95.{pdf,png}
+convert -density 300 -depth 8  -background white -flatten global_view_20k_98.{pdf,png}
+
+
+
 
 cd ..
 
