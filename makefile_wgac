@@ -33,7 +33,7 @@ all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blas
 
 
 summary.txt : data/GenomicSuperDup.tab
-	cd data && ../compute_summary_stats.sh >summary.txt
+	cd data && ../compute_summary_stats.sh >../summary.txt
 
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
