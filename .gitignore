@@ -45,6 +45,7 @@ sge_align_batch.sh
 sge_align_batch_110k.sh
 showseq.out
 stats/
+summarize_global_align_errors.txt
 trf
 trim-ends*.sh
 trim-ends*.[eo]*
