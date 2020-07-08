@@ -1,3 +1,4 @@
+module purge; module load modules modules-init modules-gs/prod modules-eichler/prod
 module load bedtools/2.29.0
 
 cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.9 ) print $0 }' >temp1000_90percent.tab
