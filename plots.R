@@ -6,7 +6,7 @@ options( echo = TRUE )
 # Constants
 bar_colors <- c("#F8766D", "#00BFC4")
 axis_labels <- element_text(family="Times New Roman", size=14)
-x_axis_ticks <- element_text(family="Times New Roman", size=14, angle=-90, hjust=0)
+x_axis_ticks <- element_text(family="Times New Roman", size=14, angle=45, hjust=1, vjust = 1)
 
 # Length distribution
 png("lendis.png", width=700)
@@ -18,7 +18,9 @@ lengths <- rbind(
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
 ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) +
-geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
+geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
+scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+
 dev.off()
 
 # 2 kbp length distribution
@@ -30,7 +32,9 @@ lengths <- rbind(
     data.frame(size=sizes, length=lendis.2K$intralen, type="intra")
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
-ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
+scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+
 dev.off()
 
 # Aligned bases by % identity
@@ -42,7 +46,9 @@ lengths <- rbind(
     data.frame(size=identities, length=simdis$intraLength, type="intra")
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
-ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
+scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+
 dev.off()
 
 # Aligned bases by % identity (smaller interval)
@@ -54,7 +60,9 @@ lengths <- rbind(
     data.frame(size=identities, length=simdis$intraLength, type="intra")
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
-ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels)
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
+scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+
 dev.off()
 
 # Similarity and Kimura's k by length
