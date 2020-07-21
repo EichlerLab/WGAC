@@ -299,8 +299,8 @@ mark_permanent=>0
 mark_subs=>1
 # [0|1] toggles the coloring/marking of sub(jects) off and on
 pair_align_path_col=>
-pair_inter_color=>red
-# [color] default of inter pairwise and connecting lines
+pair_inter_color=>#E41A1C
+# [color] default of inter pairwise and connecting lines (red)
 pair_inter_line_on=>1
 # [0|1] toggles off and on the connecting lines between inter pairwise alignments
 pair_inter_offset=>0
@@ -309,8 +309,8 @@ pair_inter_on=>1
 # [0|1] toggles off and on the inter pairwise alignments normally drawn on top of sequence line
 pair_inter_width=>13
 # [integer] width of inter pairwise
-pair_intra_color=>blue
-# [color] default of intra pairwise and connecting lines
+pair_intra_color=>#377EB8
+# [color] default of intra pairwise and connecting lines (blue)
 pair_intra_line_on=>1
 # [0|1] toggles connecting lines between  intra pairwise off and on
 pair_intra_offset=>0
