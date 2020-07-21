@@ -5,8 +5,14 @@ options( echo = TRUE )
 
 # Constants
 bar_colors <- c("#F8766D", "#00BFC4")
-axis_labels <- element_text(family="Times New Roman", size=14)
-x_axis_ticks <- element_text(family="Times New Roman", size=14, angle=45, hjust=1, vjust = 1)
+axis_labels <- element_text(family="Times New Roman", size=18)
+x_axis_ticks <- element_text(family="Times New Roman", size=18, angle=45, hjust=1, vjust = 1)
+
+
+library(RColorBrewer)
+colors <- brewer.pal(n = 3, name = 'Set1')[1:2]
+# colors[1] is red
+# colors[2] is blue
 
 # Length distribution
 png("lendis.png", width=700)
@@ -19,7 +25,7 @@ lengths <- rbind(
 # Convert bases to Megabases by dividing lengths by 1,000,000.
 ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) +
 geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
-scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+scale_fill_manual("legend", values = c("intra" = colors[2], "inter" = colors[1] ) )
 
 dev.off()
 
@@ -33,7 +39,7 @@ lengths <- rbind(
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
 ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
-scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+scale_fill_manual("legend", values = c("intra" = colors[2], "inter" = colors[1] ) )
 
 dev.off()
 
@@ -47,7 +53,7 @@ lengths <- rbind(
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
 ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
-scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+scale_fill_manual("legend", values = c("intra" = colors[2], "inter" = colors[1] ) )
 
 dev.off()
 
@@ -61,7 +67,7 @@ lengths <- rbind(
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
 ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Aligned Bases (Mbp)") + xlab("Identity") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
-scale_fill_manual("legend", values = c("intra" = "lightslategrey", "inter" = "darkgoldenrod2" ) )
+scale_fill_manual("legend", values = c("intra" = colors[2], "inter" = colors[1] ) )
 
 dev.off()
 
