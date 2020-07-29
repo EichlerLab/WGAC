@@ -356,7 +356,9 @@ seq_label_fontsize=>18
 # [integer] font size (in points) for all sequence names
 seq_label_offset=>15
 # [integer] vertical offset of sequence names (up is negative, down is positive)
-seq_label_offset_h=>-65
+# changed DG July 29, 2020
+#seq_label_offset_h=>-65
+seq_label_offset_h=>-120
 # [integer] horizontal offset of sequence names
 seq_label_on=>1
 # [0|1] toggles off and on the display of sequence name labels
