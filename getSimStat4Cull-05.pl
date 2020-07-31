@@ -96,7 +96,8 @@ print "size\tinter\tintra\tTotal\tinterLength\tintraLength\tTotalLength\n";
 foreach $k(@keyArray){
 	$total = $interSimCountHash{$k} + $intraSimCountHash{$k};
 	$tlen = $interSimLengthHash{$k} + $intraSimLengthHash{$k};
-	print "$k\t$interSimCountHash{$k}\t$intraSimCountHash{$k}\t$total\t$interSimLengthHash{$k}\t$intraSimLengthHash{$k}\t$tlen\n";
+    my $fPerCent = $k * 100;
+	print "$fPerCent\t$interSimCountHash{$k}\t$intraSimCountHash{$k}\t$total\t$interSimLengthHash{$k}\t$intraSimLengthHash{$k}\t$tlen\n";
 }
 #-- subs ---- 
 sub sortSim{
