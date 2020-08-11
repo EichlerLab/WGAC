@@ -105,6 +105,15 @@ FILE: foreach my $f (@files) {
 		s/ +//;
 		chomp; chomp;
 		$position += length;
+
+		# added DG, 8/10/2020
+		if ( length >= $opt_s ) {
+			die "line length is too long:  " . length . " which must be less than -s size of " . $opt_s . "  Please fold to make line lengths shorter\n";
+		}
+		# end of addition
+
+
+
 		if ($position >= $e) {
 			print OUT substr($_,0,$e-($position-length)), "\n";
 			substr($_,0,$e-($position-length)) ='';
