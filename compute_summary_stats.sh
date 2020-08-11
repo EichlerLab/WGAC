@@ -1,52 +1,80 @@
 module load bedtools/2.29.0
 
-cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.9 ) print $0 }' >temp1000_90percent.tab
-grep "^chr" temp1000_90percent.tab | awk '{ if ( $4 ~ /^chr/ ) print }'  >temp1000_90percent_just_chr.tab
+cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.9 ) print $0 }' >temp1kb_90percent.tab
+grep "^chr" temp1kb_90percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }'  >temp1kb_90percent_just_chr.tab
 
 
-echo "all calculations below are for seg dups >= 1kb and >= 90%"
-
-echo "number of bases in all of these seg dups (not counting any bases twice)"
-bedBases.sh <temp1000_90percent.tab
-echo "just chr:"
-bedBases.sh <temp1000_90percent_just_chr.tab
-
-echo "number of non-redundant loci:"
-cat temp1000_90percent.tab | sort -k1,1V -k2,2n | bedtools merge -i stdin | wc -l
-echo "just loci of seg dups between chromosomes:"
-cat temp1000_90percent_just_chr.tab | awk '{print $1"\t"$2"\t"$3}' | sort -k1,1V -k2,2n | bedtools merge -i stdin | wc -l
+cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.95 ) print $0 }' >temp1kb_95percent.tab
+grep "^chr" temp1kb_95percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }'  >temp1kb_95percent_just_chr.tab
 
 
-echo "number of pairwise alignments:"
-GENOMIC=`wc -l temp1000_90percent.tab | awk '{print \$1}' `
-echo $(( $GENOMIC / 2 ))
-echo "just chr:"
-GENOMIC_JUST_CHR=`wc -l temp1000_90percent_just_chr.tab | awk '{print \$1}' `
-echo $(( $GENOMIC_JUST_CHR / 2 ))
+cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.98 ) print $0 }' >temp1kb_98percent.tab
+grep "^chr" temp1kb_98percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }'  >temp1kb_98percent_just_chr.tab
+
+for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+do
+    echo $szFile
+
+    echo "# of pairwise aligments:"
+    GENOMIC=`wc -l $szFile | awk '{print \$1}' `
+    echo $(( $GENOMIC / 2 ))
+
+    echo "  inter:"
+    GENOMIC=`cat $szFile | awk '{if ( \$1 != \$7 ) print }' | wc -l | awk '{print \$1}' `
+    echo $(( $GENOMIC / 2 ))
+    DIFF_CHROMOSOMES=$(( $GENOMIC / 2 ))
+
+    echo "  intra:"
+    GENOMIC=`cat $szFile | awk '{if ( \$1 == \$7 ) print }' | wc -l | awk '{print \$1}' `
+    echo $(( $GENOMIC / 2 ))
+
+    echo "number of pairwise alignments on same chromosome but at least 1 MB apart:"
+    SAME_CHROMOSOME_1MB_APART2=`cat $szFile | awk '{if ( \$1 == \$7 ) print }' | awk '{ if ( \$2 < \$8 ) nDist = \$8 - \$3; else nDist = \$2 - \$9; if ( nDist >= 1000000 ) print }' | wc -l | awk '{print $1}' `
+    echo $(( $SAME_CHROMOSOME_1MB_APART2 / 2 ))
+    SAME_CHROMOSOME_1MB_APART=$(( $SAME_CHROMOSOME_1MB_APART2 / 2 ))
+
+    # interspersed alignments
+
+    echo "interspersed seg dups:"
+    echo $(( $DIFF_CHROMOSOMES + $SAME_CHROMOSOME_1MB_APART ))
+
+done
 
 
-echo "number of pairwise alignments between same chromosome:"
-SAME_CHROMOSOME=`cat temp1000_90percent_just_chr.tab | awk '{if ( \$1 == \$7 ) print }' | wc -l | awk '{print $1}' `
-echo $(( $SAME_CHROMOSOME / 2 ))
-
-echo "number of pairwise alignments between same chromosome and < 1MB apart:"
-SAME_CHROMOSOME_1MB_CLOSE=`cat temp1000_90percent_just_chr.tab | awk '{if ( \$1 == \$7 ) print }' |  awk '{ if ( \$2 < \$8 ) nDist = \$8 - \$3; else nDist = \$2 - \$9; if ( nDist < 1000000 ) print }' | wc -l | awk '{print $1}' ` 
-echo $(( $SAME_CHROMOSOME_1MB_CLOSE / 2 ))
-
-
-
-# interspersed alignments
-
-echo "number of pairwise alignments between different chromosomes"
-DIFF_CHROMOSOMES=`cat temp1000_90percent_just_chr.tab | awk '{if ( \$1 != \$7 ) print }' | wc -l | awk '{print \$1}'`
-echo $(( $DIFF_CHROMOSOMES / 2 ))
-
-echo "number of pairwise alignments on same chromosome but at least 1 MB apart:"
-SAME_CHROMOSOME_1MB_APART=`cat temp1000_90percent_just_chr.tab | awk '{if ( \$1 == \$7 ) print }' | awk '{ if ( \$2 < \$8 ) nDist = \$8 - \$3; else nDist = \$2 - \$9; if ( nDist >= 1000000 ) print }' | wc -l | awk '{print $1}' `
-echo $(( $SAME_CHROMOSOME_1MB_APART / 2 ))
-
-echo "interspersed seg dups:"
-echo $(( $DIFF_CHROMOSOMES / 2 + $SAME_CHROMOSOME_1MB_APART / 2 ))
+echo ""
+echo "now bp"
+echo ""
 
 
 
+for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+do
+    echo $szFile
+
+    echo "# of bases:"
+    cat $szFile | sort -k1,1V -k2,2n | bedtools merge -i stdin | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
+
+    echo "  inter:"
+    cat $szFile | awk '{if ( $1 != $7 ) print }' | sort -k1,1V -k2,2n | bedtools merge -i stdin | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
+
+
+    echo "  intra:"
+    cat $szFile | awk '{if ( $1 == $7 ) print }' | sort -k1,1V -k2,2n | bedtools merge -i stdin | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
+
+done
+
+
+echo ""
+echo "now nonredundant loci"
+echo ""
+
+
+
+for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+do
+    echo $szFile
+
+    LOCI=`cat $szFile | awk '{print \$1"\t"\$2"\t"\$3 }' | sort -k1,1V -k2,2n | bedtools merge | wc -l | awk '{print \$1}'`
+    echo $LOCI
+
+done
