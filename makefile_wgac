@@ -267,11 +267,17 @@ fasta_done : fastawholesplit_done
 	touch fasta_done
 
 
-fastawholesplit_done : fastawhole.fofn
-	mkdir -p fastawholesplit
-	module load python/2.7.13 && cat `cat fastawhole.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
-	cd fastawholesplit && rename ".fasta" "" *
-	touch fastawholesplit_done
 
 fastalength.log : fastawholesplit_done
 	fasta_length -d fastawholesplit -o $@ -f
+
+fastawholesplit_done : fastawhole_shorter_lines_done
+	mkdir -p fastawholesplit
+	module load python/2.7.13 && cat `cat fastawhole_shorter_lines.fofn` | ./split_fasta_file.py stdin -d fastawholesplit
+	cd fastawholesplit && rename ".fasta" "" *
+	touch fastawholesplit_done
+
+
+fastawhole_shorter_lines_done: fastawhole.fofn
+	./longer_to_shorter_lines.sh && touch fastawhole_shorter_lines_done
+
