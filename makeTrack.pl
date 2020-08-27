@@ -70,7 +70,10 @@ while (<INFILE>) {
 	} else {
 		$otherStart = $columnvalues[$colname2Pos{'SE'}];
 		$otherEnd = $columnvalues[$colname2Pos{'SB'}];
-		$strand = '_';
+        # changed Aug 27, 2020 (DG)
+		#$strand = '_';
+		$strand = '-';
+        # end of change
 	}
 	
 	# convert to UCSC convention
