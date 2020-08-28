@@ -79,7 +79,8 @@ with open( "summarize_global_align_errors.txt", "w" ) as fSummarizeOutput:
 
 
     
-    
+print "\n\n\nSee: summarize_global_align_errors.txt\n\n"
+
 
     
     
