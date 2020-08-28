@@ -1,5 +1,5 @@
 module purge
-module load modules modules-init modules-gs/prod modules-eichler/prod libevent/2.1.3-alpha
+module load modules modules-init modules-gs/prod modules-eichler/prod
 
 module load miniconda/4.5.12
 
