@@ -206,6 +206,7 @@ data/intra_block.parse : lastz_self_done
 	mkdir -p tmp
 	# changes for lastz instead of the Sun program webb_self (DG, July 15, 2019)
 	#export PERL5LIB=./JABPerlMod; blast_lav_break_self_overlap2_for_lastz.pl --in selfblast --out tmp
+	# this prints PRINT DOUBLE GAP ERROR and BAD ALIGNMENT but so does the parser of blast
 	blast_lav_break_self_overlap2_for_lastz.pl --in selfblast --out tmp
 	blast_lav_hit_by_hit_for_lastz.pl --in tmp --out $@ \
 		-options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
@@ -226,6 +227,7 @@ data/inter_block.parse : blastout_done
 	find $^ -type f -exec grep -L 'Matrix' {} \;
 	# /usr/bin/perl must be used--not one of the perl modules
 	export PATH=/usr/bin:$PATH
+	# this prints PRINT DOUBLE GAP ERROR and BAD ALIGNMENT but so does the parser of lastz
 	blastparser42.pl -in ./blastout \
 		-out data/inter_block.parse \
 		-noprevq -v \
