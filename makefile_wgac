@@ -6,7 +6,7 @@
 # to be used for filenames
 TRIM_SPECIES=anything
 # Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
-BLAST_SEED_SIZE=250
+BLAST_SEED_SIZE=5000
 
 
 
@@ -133,6 +133,7 @@ data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alig
 #data/both.alignscorerdata : data/align_both
 data/both.alignscorerdata : global_align_110k_done
 	# data/align_both is the input I think (DG, May 2020) 
+    # prints lots of "BASE SPACE MATRIX" to stdout while running
 	align_scorer_batch2.pl -a data/align_both -d data/align_both_data -p both -o $@
 
 # #data/align_both : fasta_done data/both.parse.defugu.trim.fixed.trim.defrac
@@ -209,7 +210,7 @@ data/intra_block.parse : lastz_self_done
 	# this prints PRINT DOUBLE GAP ERROR and BAD ALIGNMENT but so does the parser of blast
 	blast_lav_break_self_overlap2_for_lastz.pl --in selfblast --out tmp
 	blast_lav_hit_by_hit_for_lastz.pl --in tmp --out $@ \
-		-options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
+		-options 'MIN_BPALIGN=>5000, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
 	rm -rf tmp
 
 lastz_self_done : fugu2_done
