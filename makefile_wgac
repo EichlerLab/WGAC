@@ -210,7 +210,7 @@ data/intra_block.parse : lastz_self_done
 	# this prints PRINT DOUBLE GAP ERROR and BAD ALIGNMENT but so does the parser of blast
 	blast_lav_break_self_overlap2_for_lastz.pl --in selfblast --out tmp
 	blast_lav_hit_by_hit_for_lastz.pl --in tmp --out $@ \
-		-options 'MIN_BPALIGN=>5000, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
+		-options 'MIN_BPALIGN=>200, MIN_FRACBPMATCH=>0.88, MAX_%GAP => 40, SKIP_SELF => 0, SKIP_OVERLAP=>1'
 	rm -rf tmp
 
 lastz_self_done : fugu2_done
