@@ -6,7 +6,7 @@
 # to be used for filenames
 TRIM_SPECIES=anything
 # Evan (4/12/2019) said BLAST_SEED_SIZE should be 250--not 500
-BLAST_SEED_SIZE=5000
+BLAST_SEED_SIZE=250
 
 
 
