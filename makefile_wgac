@@ -110,10 +110,12 @@ stats/mergeHit : stats/oneHitPerLine_sort
 stats/oneHitPerLine_sort : stats/oneHitPerLine
 	sort -k 1,1 -k 2,2n $< > $@
 
+# changed DG 12/2021 to not have kb on every x label
+#	perl ./getLenStat4Cull.pl $< > stats/all.join.cull.lenDis
 stats/oneHitPerLine : data/oo.weild10kb.join.all.cull
 	mkdir -p stats
 	perl ./getSimStat4Cull.pl $< > stats/all.join.cull.simDis
-	perl ./getLenStat4Cull.pl $< > stats/all.join.cull.lenDis
+	perl ./getLenStat4Cull.pl $< | sed 's/\.kb//' > stats/all.join.cull.lenDis
 	perl ./getLenStat4Cull-2K.pl $< >stats/all.join.cull.lenDis_2K
 	perl ./getSimStat4Cull-05.pl $< >stats/all.join.cull.simDis_05
 	perl ./oneHitPerLine.pl $< >$@
