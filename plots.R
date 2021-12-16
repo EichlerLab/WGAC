@@ -26,7 +26,7 @@ lengths <- rbind(
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
 ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) +
-geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
+geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)", breaks = c(100,200, 300, 400, 500)) + xlab("Duplication Length (KB)") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=axis_labels, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
 scale_fill_manual("legend", values = c("intra" = colors[2], "inter" = colors[1] ) )
 
 dev.off()
@@ -40,7 +40,7 @@ lengths <- rbind(
     data.frame(size=sizes, length=lendis.2K$intralen, type="intra")
 )
 # Convert bases to Megabases by dividing lengths by 1,000,000.
-ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
+ggplot(lengths, aes(y=length/1000000, x=size, fill=type)) + geom_bar(position="dodge", stat = "identity") + scale_y_continuous("Duplicated Bases (Mbp)") + xlab("Duplication Length (KB)") + theme_bw() + theme(axis.title.x=axis_labels, axis.title.y=axis_labels, axis.text.x=x_axis_ticks, axis.text.y=axis_labels, legend.text=axis_labels, legend.title=axis_labels) +
 scale_fill_manual("legend", values = c("intra" = colors[2], "inter" = colors[1] ) )
 
 dev.off()
