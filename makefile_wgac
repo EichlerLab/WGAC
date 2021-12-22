@@ -29,7 +29,7 @@ BLAST_SEED_SIZE=250
 
 .PHONY : all_stats plots
 
-all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen summary.txt
+all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen summary.txt chromosomes_file_exists_flag
 
 
 summary.txt : data/GenomicSuperDup.tab
@@ -40,6 +40,9 @@ all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.ta
 
 plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
 	module load R/3.6.1; pushd stats; Rscript ../plots.R; popd; module load perl/5.14.2 && ./for_parasight.sh
+
+plots_just_chromosomes : stats_just_chromosomes/all.join.cull.simDis_05 stats_just_chromosomes/all.join.cull.lenDis_2K stats_just_chromosomes/all.join.cull.lenDis stats_just_chromosomes/all.join.cull.simDis stats_just_chromosomes/nr_stats.tab stats_just_chromosomes/length_similarity_kimura
+	module load R/3.6.1; pushd stats_just_chromosomes; Rscript ../plots.R; popd; module load perl/5.14.2
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
@@ -110,15 +113,24 @@ stats/mergeHit : stats/oneHitPerLine_sort
 stats/oneHitPerLine_sort : stats/oneHitPerLine
 	sort -k 1,1 -k 2,2n $< > $@
 
-# changed DG 12/2021 to not have kb on every x label
-#	perl ./getLenStat4Cull.pl $< > stats/all.join.cull.lenDis
 stats/oneHitPerLine : data/oo.weild10kb.join.all.cull
 	mkdir -p stats
 	perl ./getSimStat4Cull.pl $< > stats/all.join.cull.simDis
-	perl ./getLenStat4Cull.pl $< | sed 's/\.kb//' > stats/all.join.cull.lenDis
+	perl ./getLenStat4Cull.pl $< > stats/all.join.cull.lenDis
 	perl ./getLenStat4Cull-2K.pl $< >stats/all.join.cull.lenDis_2K
 	perl ./getSimStat4Cull-05.pl $< >stats/all.join.cull.simDis_05
 	perl ./oneHitPerLine.pl $< >$@
+
+stats_just_chromosomes/oneHitPerLine : data/oo.weild10kb.join.all.cull.just.chromosomes
+	mkdir -p stats_just_chromosomes
+	perl ./getSimStat4Cull.pl $< > stats_just_chromosomes/all.join.cull.simDis
+	perl ./getLenStat4Cull.pl $< > stats_just_chromosomes/all.join.cull.lenDis
+	perl ./getLenStat4Cull-2K.pl $< >stats_just_chromosomes/all.join.cull.lenDis_2K
+	perl ./getSimStat4Cull-05.pl $< >stats_just_chromosomes/all.join.cull.simDis_05
+	perl ./oneHitPerLine.pl $< >$@
+
+data/oo.weild10kb.join.all.cull.just.chromosomes : data/oo.weild10kb.join.all.cull
+	grep -vw -f chromosomes.txt $< >$@
 
 data/GenomicSuperDup.tab : data/oo.weild10kb.join.all.cull
 	perl ./makeTrack.pl $< > $@
@@ -283,6 +295,8 @@ fastawholesplit_done : fastawhole_shorter_lines_done
 	touch fastawholesplit_done
 
 
-fastawhole_shorter_lines_done: fastawhole.fofn
+fastawhole_shorter_lines_done: fastawhole.fofn chromosomes_file_exists_flag
 	./longer_to_shorter_lines.sh && touch fastawhole_shorter_lines_done
 
+chromosomes_file_exists_flag:
+	if [ -f "chromosomes.txt" ]; then touch chromosomes_file_exists_flag; else echo "you must create a file chromosomes.txt that has a list of the chromosomes for this genome"; fi
