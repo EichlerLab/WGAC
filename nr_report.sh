@@ -33,6 +33,10 @@ join -t '	' -a 1 -j 1 -o 1.1 2.2 -e "0" "$OUTPUT" "$INTER" > tmp && mv -f tmp "$
 join -t '	' -a 1 -j 1 -o 1.1 1.2 2.2 -e "0" "$OUTPUT" "$INTRA" > tmp && mv -f tmp "$OUTPUT"
 join -t '	' -a 1 -j 1 -o 1.1 1.2 1.3 2.2 -e "0" "$OUTPUT" "$ALL" > tmp && mv -f tmp "$OUTPUT"
 
+# added DG Dec 2021 so that stats_just_chromosomes/nonredundant_duplication_by_chromosome.png
+# will be ordered chr1 chr2 chr3 ...
+sort -V "$OUTPUT" > tmp  && mv -f tmp "$OUTPUT"
+
 awk -v factor="$FACTOR" \
 'BEGIN { OFS="\t"; print "contig","inter","intra","total" }
        { print $1,$2/factor,$3/factor,$4/factor }
