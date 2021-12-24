@@ -13,7 +13,7 @@ cd ..
 
 echo -e "seqname\tlength" >showseq_just_chromosomes.out
 
-grep -wf chromosomes.txt data/length_tab | sort -V >> showseq_just_chromosomes.out
+cat data/length_tab | filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq_just_chromosomes.out
 
 mkdir -p globalViewJustChromosomes
 cd globalViewJustChromosomes
