@@ -29,7 +29,7 @@ BLAST_SEED_SIZE=250
 
 .PHONY : all_stats plots
 
-all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen summary.txt chromosomes_file_exists_flag
+all : fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen summary.txt
 
 
 summary.txt : data/GenomicSuperDup.tab
@@ -38,11 +38,14 @@ summary.txt : data/GenomicSuperDup.tab
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
-plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
+all_plots: plots plots_just_chromosomes
+
+#plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
+plots : stats/oneHitPerLine stats/length_similarity_kimura stats/nr_stats.tab
 	module load R/3.6.1; pushd stats; Rscript ../plots.R; popd; module load perl/5.14.2 && ./for_parasight.sh
 
-plots_just_chromosomes : stats_just_chromosomes/all.join.cull.simDis_05 stats_just_chromosomes/all.join.cull.lenDis_2K stats_just_chromosomes/all.join.cull.lenDis stats_just_chromosomes/all.join.cull.simDis stats_just_chromosomes/nr_stats.tab stats_just_chromosomes/length_similarity_kimura
-	module load R/3.6.1; pushd stats_just_chromosomes; Rscript ../plots.R; popd; module load perl/5.14.2
+plots_just_chromosomes : stats_just_chromosomes/oneHitPerLine stats_just_chromosomes/length_similarity_kimura stats_just_chromosomes/nr_stats.tab
+	module load R/3.6.1; pushd stats_just_chromosomes; Rscript ../plots.R; popd; module load perl/5.14.2 && ./for_parasight_just_chromosomes.sh
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
@@ -68,6 +71,9 @@ stats/mergedWGAC.tab : stats/allWGAC.tab
 stats/allWGAC.tab : data/GenomicSuperDup.tab
 	cut -f 1-3 $< > $@
 
+stats_just_chromosomes/length_similarity_kimura : data/oo.weild10kb.join.all.cull.just.chromosomes
+	cut -f 23,28,34 $< > $@
+
 stats/length_similarity_kimura : data/oo.weild10kb.join.all.cull
 	cut -f 23,28,34 $< > $@
 
@@ -86,31 +92,66 @@ stats/inter_all_dup : stats/interSort
 stats/nr_stats.tab : fastalength.log stats/interDupLen stats/intraDupLen stats/AllDupLen
 	./nr_report.sh $^ $@
 
+stats_just_chromosomes/nr_stats.tab : fastalength_just_chromosomes.log stats_just_chromosomes/interDupLen stats_just_chromosomes/intraDupLen stats_just_chromosomes/AllDupLen
+	./nr_report.sh $^ $@
+
+
+fastalength_just_chromosomes.log : fastalength.log chromosomes.txt
+	head -1 fastalength.log >temp && cat fastalength.log | sed '1d;$d' | filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 1 | sort -k2,2V >>temp && echo "dummy_last_line" >>temp && mv temp fastalength_just_chromosomes.log 
+
+
 stats/intraDupLen : stats/intraMerge
+	perl ./statLenPerChr.pl $< > $@
+
+stats_just_chromosomes/intraDupLen : stats_just_chromosomes/intraMerge
 	perl ./statLenPerChr.pl $< > $@
 
 stats/interDupLen : stats/interMerge
 	perl ./statLenPerChr.pl $< > $@
 
+stats_just_chromosomes/interDupLen : stats_just_chromosomes/interMerge
+	perl ./statLenPerChr.pl $< > $@
+
 stats/intraMerge : stats/intraSort
+	perl ./mergeHit.pl $< > $@
+
+stats_just_chromosomes/intraMerge : stats_just_chromosomes/intraSort
 	perl ./mergeHit.pl $< > $@
 
 stats/interMerge : stats/interSort
 	perl ./mergeHit.pl $< > $@
 
+stats_just_chromosomes/interMerge : stats_just_chromosomes/interSort
+	perl ./mergeHit.pl $< > $@
+
 stats/intraSort : stats/oneHitPerLine_sort
+	grep "intra" $< > $@
+
+stats_just_chromosomes/intraSort : stats_just_chromosomes/oneHitPerLine_sort
 	grep "intra" $< > $@
 
 stats/interSort : stats/oneHitPerLine_sort
 	grep "inter" $< > $@
 
+stats_just_chromosomes/interSort : stats_just_chromosomes/oneHitPerLine_sort
+	grep "inter" $< > $@
+
 stats/AllDupLen : stats/mergeHit
+	perl ./statLenPerChr.pl $< > $@
+
+stats_just_chromosomes/AllDupLen : stats_just_chromosomes/mergeHit
 	perl ./statLenPerChr.pl $< > $@
 
 stats/mergeHit : stats/oneHitPerLine_sort
 	perl ./mergeHit.pl $< > $@
 
+stats_just_chromosomes/mergeHit : stats_just_chromosomes/oneHitPerLine_sort
+	perl ./mergeHit.pl $< > $@
+
 stats/oneHitPerLine_sort : stats/oneHitPerLine
+	sort -k 1,1 -k 2,2n $< > $@
+
+stats_just_chromosomes/oneHitPerLine_sort : stats_just_chromosomes/oneHitPerLine
 	sort -k 1,1 -k 2,2n $< > $@
 
 stats/oneHitPerLine : data/oo.weild10kb.join.all.cull
@@ -129,8 +170,10 @@ stats_just_chromosomes/oneHitPerLine : data/oo.weild10kb.join.all.cull.just.chro
 	perl ./getSimStat4Cull-05.pl $< >stats_just_chromosomes/all.join.cull.simDis_05
 	perl ./oneHitPerLine.pl $< >$@
 
-data/oo.weild10kb.join.all.cull.just.chromosomes : data/oo.weild10kb.join.all.cull
-	grep -vw -f chromosomes.txt $< >$@
+data/oo.weild10kb.join.all.cull.just.chromosomes : data/oo.weild10kb.join.all.cull chromosomes.txt
+	# to copy the header line
+	head -1 data/oo.weild10kb.join.all.cull >data/oo.weild10kb.join.all.cull.just.chromosomes
+	cat data/oo.weild10kb.join.all.cull chromosomes.txt | filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 4 >>data/oo.weild10kb.join.all.cull.just.chromosomes
 
 data/GenomicSuperDup.tab : data/oo.weild10kb.join.all.cull
 	perl ./makeTrack.pl $< > $@
@@ -295,8 +338,5 @@ fastawholesplit_done : fastawhole_shorter_lines_done
 	touch fastawholesplit_done
 
 
-fastawhole_shorter_lines_done: fastawhole.fofn chromosomes_file_exists_flag
+fastawhole_shorter_lines_done: fastawhole.fofn
 	./longer_to_shorter_lines.sh && touch fastawhole_shorter_lines_done
-
-chromosomes_file_exists_flag:
-	if [ -f "chromosomes.txt" ]; then touch chromosomes_file_exists_flag; else echo "you must create a file chromosomes.txt that has a list of the chromosomes for this genome"; fi
