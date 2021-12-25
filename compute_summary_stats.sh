@@ -1,15 +1,31 @@
 module load bedtools/2.29.0
 
 cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.9 ) print $0 }' >temp1kb_90percent.tab
-grep "^chr" temp1kb_90percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn  >temp1kb_90percent_just_chr.tab
+
+cat temp1kb_90percent.tab | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 0 | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 6 >temp1kb_90percent_just_chr.tab
+
+# above replaces this:
+#grep "^chr" temp1kb_90percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn  >temp1kb_90percent_just_chr.tab
+
+
 
 
 cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.95 ) print $0 }' >temp1kb_95percent.tab
-grep "^chr" temp1kb_95percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn >temp1kb_95percent_just_chr.tab
+
+cat temp1kb_95percent.tab | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 0 | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 6 >temp1kb_95percent_just_chr.tab
+
+
+# above replaces this:
+#grep "^chr" temp1kb_95percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn >temp1kb_95percent_just_chr.tab
 
 
 cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.98 ) print $0 }' >temp1kb_98percent.tab
-grep "^chr" temp1kb_98percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn >temp1kb_98percent_just_chr.tab
+
+
+cat temp1kb_98percent.tab | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 0 | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 6 >temp1kb_98percent_just_chr.tab
+
+# above replaces this:
+#grep "^chr" temp1kb_98percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn >temp1kb_98percent_just_chr.tab
 
 for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
 do
