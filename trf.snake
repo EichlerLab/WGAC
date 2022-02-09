@@ -30,9 +30,9 @@ rule allDone:
 rule runTrfOneFile:
 	output: "fugu_trf/{szFasta}"
 	input: "populate_trf_with_links_done", "trf/{szFasta}"
-	params: sge_opts=""
+	params: sge_opts=" -l mfree=16G "
 	run:
-		szCommand = "cd trf && ~/bin/trf " + str( wildcards.szFasta ) + " 2 7 7 80 10 50 5 -d -h -m" 
+		szCommand = "cd trf && ~/bin/trf " + str( wildcards.szFasta ) + " 2 7 7 80 10 50 5 -l 25 -d -h -m" 
 		print( "about to execute: " + szCommand )
 		shell( szCommand )
 
