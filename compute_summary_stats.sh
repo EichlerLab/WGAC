@@ -58,7 +58,7 @@ done
 
 
 echo ""
-echo "now bp"
+echo "now bp (non-redundant)"
 echo ""
 
 
