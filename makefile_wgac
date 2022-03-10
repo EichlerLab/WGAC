@@ -38,14 +38,18 @@ summary.txt : data/GenomicSuperDup.tab chromosomes.txt
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
-all_plots: plots plots_just_chromosomes
+all_plots: plots plots_just_chromosomes parasightWithFakeChromosomeDone
 
 #plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
+
 plots : stats/oneHitPerLine stats/length_similarity_kimura stats/nr_stats.tab
 	module load R/3.6.1; pushd stats; Rscript ../plots.R; popd; module load perl/5.14.2 && ./for_parasight.sh
 
 plots_just_chromosomes : stats_just_chromosomes/oneHitPerLine stats_just_chromosomes/length_similarity_kimura stats_just_chromosomes/nr_stats.tab
 	module load R/3.6.1; pushd stats_just_chromosomes; Rscript ../plots.R; popd; module load perl/5.14.2 && ./for_parasight_just_chromosomes.sh
+
+parasightWithFakeChromosomeDone: stats/oneHitPerLine stats/length_similarity_kimura stats/nr_stats.tab
+	module load perl/5.14.2 && ./parasightWithFakeChromosome.sh
 
 stats/gt94WGAC_ge10K.tab : stats/gt94WGAC.merged \
 	awk '$$3 - $$2 >= 10000' $< > $@
