@@ -2,6 +2,7 @@
 # see:  https://eichlerlab.gs.washington.edu/help/wiki/doku.php?id=methods:pipelines:wgac#defuguize_regions
 # make an fofn of the sequences called fastawhole.fofn
 
+
 # TRIM_SPECIES must not have any spaces in it.  It appears to be just
 # to be used for filenames
 TRIM_SPECIES=anything
