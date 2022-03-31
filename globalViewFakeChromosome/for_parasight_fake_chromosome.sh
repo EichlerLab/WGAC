@@ -13,7 +13,7 @@ set -vex
 
 echo -e "seqname\tlength" >showseq_fake_chromosome.out
 
-cat ../data/length_tab | ../filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq_fake_chromosome.out
+cat fastalength.log | sed 1d | sed '$d' | awk '{print $2"\t"$3}' | ../filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq_fake_chromosome.out
 
 # add the fake chromosome
  awk '{x += $2 } END{ print "UNK\t"x }' fakeChromosomeOffsets.txt >>showseq_fake_chromosome.out
