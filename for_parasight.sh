@@ -12,7 +12,12 @@ cd ..
 
 echo -e "seqname\tlength" >showseq.out
 
-sed '/random/d;/chrUn/d' data/length_tab | grep "^chr" | sort -V >> showseq.out
+# changed DG Mar 31, 2022
+#sed '/random/d;/chrUn/d' data/length_tab | grep "^chr" | sort -V >> showseq.out
+
+cat fastalength.log | sed 1d | sed '$d' | awk '{print $2"\t"$3}' | ./filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq.out
+
+
 
 mkdir -p globalView
 cd globalView
@@ -94,6 +99,8 @@ convert -density 300 -depth 8  -background white -flatten global_view_20k_95.{pd
 convert -density 300 -depth 8  -background white -flatten global_view_20k_98.{pdf,png}
 
 
+# added DG, March 31, 2022 since we never use general views
+exit 0;
 
 
 cd ..
