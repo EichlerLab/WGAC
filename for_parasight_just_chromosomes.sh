@@ -13,7 +13,12 @@ cd ..
 
 echo -e "seqname\tlength" >showseq_just_chromosomes.out
 
-cat data/length_tab | filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq_just_chromosomes.out
+# changed DG Apr 1, 2022 since data/length_tab no longer exists
+#cat data/length_tab | filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq_just_chromosomes.out
+
+cat fastalength.log | sed 1d | sed '$d' | awk '{print $2"\t"$3}' | ./filterByTokenValue.py --szFileOfLegalValues chromosomes.txt --n0BasedToken 0 | sort -V >> showseq_just_chromosomes.out
+
+
 
 mkdir -p globalViewJustChromosomes
 cd globalViewJustChromosomes
