@@ -100,6 +100,8 @@ convert -density 300 -depth 8  -background white -flatten global_view_20k_95.{pd
 convert -density 300 -depth 8  -background white -flatten global_view_20k_98.{pdf,png}
 
 
+# added (DG, 4/1/2022) since general views and blowups are never used
+exit
 
 
 cd ..
