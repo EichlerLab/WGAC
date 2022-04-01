@@ -1,13 +1,15 @@
 set -vex
 
-cd data
-cut -f 1,2,3,4,5,6,7,8,23,28 oo.weild10kb.join.all.cull > xw.join.all.cull
-perl ../xwalign.pl xw.join.all.cull > xw.al
+# changed DG Apr 1, 2022 since xw.al is now made in makefile_wgac and
+# shared with globalViewFakeChromosome/for_parasight_fake_chromosome.sh
+# cd data
+# cut -f 1,2,3,4,5,6,7,8,23,28 oo.weild10kb.join.all.cull > xw.join.all.cull
+# perl ../xwalign.pl xw.join.all.cull > xw.al
 
-perl ../writeGenomeLengHash.pl ../fastalength.log > length_hash
-perl ../writeGenomeLengtab.pl ../fastalength.log > length_tab
+# perl ../writeGenomeLengHash.pl ../fastalength.log > length_hash
+# perl ../writeGenomeLengtab.pl ../fastalength.log > length_tab
 
-cd ..
+# cd ..
 
 
 echo -e "seqname\tlength" >showseq.out
