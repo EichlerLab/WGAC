@@ -30,12 +30,14 @@ BLAST_SEED_SIZE=250
 
 .PHONY : all_stats plots
 
-all : chromosomes.txt fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen summary.txt
+all : chromosomes.txt fastalength.log fasta_done mask_out_done fugu_done blastdb/bofugu.nsq blastout_done data/inter_block.parse fugu2_done lastz_self_done data/intra_block.parse data/both.parse data/both.parse.defugu data/both.parse.defugu.trim data/both.parse.defugu.trim.fixed.trim data/both.parse.defugu.trim.fixed.trim.defrac data/both.alignscorerdata data/defrac.align data/oo.weild10kb.join.all data/oo.weild10kb.join.all.cull data/GenomicSuperDup.tab stats/oneHitPerLine stats/oneHitPerLine_sort stats/mergeHit stats/AllDupLen stats/interSort  stats/intraSort stats/interMerge stats/intraMerge stats/interDupLen stats/intraDupLen summary.txt summary.xlsx
 
+# summary.xlsx is useful for quickly making powerpoint presentations
+summary.xlsx : summary.txt
+	module load python/3.7.7 numpy/1.21.1 pandas/1.3.1 && ./make_excel_summary.py --szSummaryInputFile summary.txt --szExcelOutputFile summary.xlsx
 
 summary.txt : data/GenomicSuperDup.tab chromosomes.txt
 	cd data && ../compute_summary_stats.sh >../summary.txt
-
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
