@@ -1,12 +1,20 @@
 module load bedtools/2.29.0
 
+
+# prepare for 1kb and 90% similarity
+
+
 cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 1000 ) print }' | awk '{if ( $26 >= 0.9 ) print $0 }' >temp1kb_90percent.tab
 
 cat temp1kb_90percent.tab | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 0 | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 6 >temp1kb_90percent_just_chr.tab
 
-# above replaces this:
-#grep "^chr" temp1kb_90percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn  >temp1kb_90percent_just_chr.tab
 
+
+# prepare for 10kb and 95% similarity
+
+cat GenomicSuperDup.tab | awk '{if ($3-$2 >= 10000 ) print }' | awk '{if ( $26 >= 0.95 ) print $0 }' >temp10kb_95percent.tab
+
+cat temp10kb_95percent.tab | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 0 | ../filterByTokenValue.py --szFileOfLegalValues ../chromosomes.txt --n0BasedToken 6 >temp10kb_95percent_just_chr.tab
 
 
 
@@ -27,11 +35,11 @@ cat temp1kb_98percent.tab | ../filterByTokenValue.py --szFileOfLegalValues ../ch
 # above replaces this:
 #grep "^chr" temp1kb_98percent.tab | awk '{ if ( $7 ~ /^chr/ ) print }' | grep -v random | grep -v chrUn >temp1kb_98percent_just_chr.tab
 
-for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab temp10kb_95percent.tab temp10kb_95percent_just_chr.tab
 do
     echo $szFile
 
-    echo "# of pairwise aligments:"
+    echo "# of pairwise alignments:"
     GENOMIC=`wc -l $szFile | awk '{print \$1}' `
     echo $(( $GENOMIC / 2 ))
 
@@ -58,24 +66,31 @@ done
 
 
 echo ""
-echo "now bp (non-redundant)"
+echo "now bp"
 echo ""
 
 
 
-for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab  temp10kb_95percent.tab temp10kb_95percent_just_chr.tab
 do
     echo $szFile
 
-    echo "# of bases:"
+    echo "# of bases (nonredundant, redundant):"
     cat $szFile | sort -k1,1V -k2,2n | bedtools merge -i stdin | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
 
-    echo "  inter:"
+    cat $szFile | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
+
+    echo "  inter (nonredundant, redundant):"
     cat $szFile | awk '{if ( $1 != $7 ) print }' | sort -k1,1V -k2,2n | bedtools merge -i stdin | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
 
+    cat $szFile | awk '{if ( $1 != $7 ) print }' | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
 
-    echo "  intra:"
+
+    echo "  intra (nonredundant, redundant):"
     cat $szFile | awk '{if ( $1 == $7 ) print }' | sort -k1,1V -k2,2n | bedtools merge -i stdin | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
+
+    cat $szFile | awk '{if ( $1 == $7 ) print }' | awk '{x += ( $3 - $2); y+=1 } END { print x }' | xargs printf "%'d\n"
+
 
 done
 
@@ -86,7 +101,7 @@ echo ""
 
 
 
-for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+for szFile in temp1kb_90percent.tab temp1kb_95percent.tab temp1kb_98percent.tab temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab  temp10kb_95percent.tab temp10kb_95percent_just_chr.tab
 do
     echo $szFile
 
@@ -100,7 +115,7 @@ echo "inter-chromosomal"
 echo ""
 
 
-for szFile in temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+for szFile in temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab temp10kb_95percent_just_chr.tab
 do
     echo $szFile
 
@@ -116,7 +131,7 @@ echo "intra-chromosomal"
 echo ""
 
 
-for szFile in temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab
+for szFile in temp1kb_90percent_just_chr.tab temp1kb_95percent_just_chr.tab temp1kb_98percent_just_chr.tab temp10kb_95percent_just_chr.tab
 do
     echo $szFile
 
