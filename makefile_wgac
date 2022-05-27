@@ -203,6 +203,7 @@ data/defrac.align : data/both.parse.defugu.trim.fixed.trim.defrac data/both.alig
 #data/both.alignscorerdata : data/align_both
 data/both.alignscorerdata : global_align_110k_done
 	# data/align_both is the input I think (DG, May 2020) 
+	# data/align_both_data and align_scorer.summary.table are the outputs
     # prints lots of "BASE SPACE MATRIX" to stdout while running
 	align_scorer_batch2.pl -a data/align_both -d data/align_both_data -p both -o $@
 
@@ -222,7 +223,9 @@ data/both.alignscorerdata : global_align_110k_done
 
 
 global_align_110k_done: made_sge_align_batch_110k
-	./run_global_align_110k.snake.sh
+	#./run_global_align_110k.snake.sh || True
+	./didEnoughGlobalAlignmentsSucceed.py --szSgeAlignBatch sge_align_batch.sh --szSgeAlignBatch110k sge_align_batch_110k.sh  --global_align_110k_flags_directory global_align_110k_flags --fMaximumPerCentAlignmentFailure 5.0 && touch global_align_110k_done
+	exit
 
 made_sge_align_batch_110k: global_align_done
 	rm -rf both_tmp/both*
