@@ -41,7 +41,7 @@ summary.txt : data/GenomicSuperDup.tab chromosomes.txt
 
 all_stats : stats/gt94WGAC_ge10K.tab stats/le94WGAC_only.tab stats/mergedWGAC.tab
 
-all_plots: plots plots_just_chromosomes parasightWithFakeChromosomeDone
+all_plots: plots plots_just_chromosomes parasightWithFakeChromosomeDone parasightWithNoInterDone
 
 #plots : stats/all.join.cull.simDis_05 stats/all.join.cull.lenDis_2K stats/all.join.cull.lenDis stats/all.join.cull.simDis stats/nr_stats.tab stats/length_similarity_kimura
 
@@ -53,6 +53,9 @@ plots_just_chromosomes : stats_just_chromosomes/oneHitPerLine stats_just_chromos
 
 parasightWithFakeChromosomeDone: stats/oneHitPerLine stats/length_similarity_kimura stats/nr_stats.tab data/xw.al
 	module load perl/5.14.2 && ./parasightWithFakeChromosome.sh
+
+parasightWithNoInterDone:  parasightWithFakeChromosomeDone
+	module load perl/5.14.2 && ./parasightWithNoInter.sh
 
 data/xw.al : data/oo.weild10kb.join.all.cull
 	cd data && cut -f 1,2,3,4,5,6,7,8,23,28 oo.weild10kb.join.all.cull > xw.join.all.cull
