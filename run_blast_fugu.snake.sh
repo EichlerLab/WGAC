@@ -5,4 +5,4 @@ module load miniconda/4.5.12
 
 
 
-snakemake -s blast_fugu.snake  --jobname "{rulename}.{jobid}" --drmaa " -w n -l centos=7 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash " -w 100 --jobs 100 -p -k --restart-times 1
+snakemake -s blast_fugu.snake  --jobname "{rulename}.{jobid}" --drmaa " -w n -l centos=7 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash " -w 100 --jobs 300 -p -k --restart-times 1 --rerun-incomplete
