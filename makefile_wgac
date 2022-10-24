@@ -34,7 +34,9 @@ all : chromosomes.txt fastalength.log fasta_done mask_out_done fugu_done blastdb
 
 # summary.xlsx is useful for quickly making powerpoint presentations
 summary.xlsx : summary.txt
-	module load python/3.7.7 numpy/1.21.1 pandas/1.3.1 && ./make_excel_summary.py --szSummaryInputFile summary.txt --szExcelOutputFile summary.xlsx
+# this failed with ModuleNotFoundError: No module named 'six' 
+#	module load python/3.7.7 numpy/1.21.1 pandas/1.3.1 && ./make_excel_summary.py --szSummaryInputFile summary.txt --szExcelOutputFile summary.xlsx
+	module load miniconda/4.9.2 && ./make_excel_summary.py --szSummaryInputFile summary.txt --szExcelOutputFile summary.xlsx
 
 summary.txt : data/GenomicSuperDup.tab chromosomes.txt
 	cd data && ../compute_summary_stats.sh >../summary.txt
